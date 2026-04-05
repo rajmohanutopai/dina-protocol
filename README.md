@@ -62,16 +62,16 @@ An implementation is Dina-protocol-compliant with respect to its declared profil
 ```
 protocol/
   spec/                  # Protocol specification (10 chapters)
-    00-overview.md         # Scope, design goals, protocol shape
-    01-identity.md         # Sovereign identity and key derivation
-    02-authentication.md   # Signed requests and replay protection
-    03-storage.md          # Encrypted vault model
-    04-agent-safety.md     # Intent, grants, approvals, egress
-    05-d2d.md              # Dina-to-Dina encrypted messaging
-    06-trust.md            # Trust Network on AT Protocol
-    07-interaction.md      # Semantic operations and response envelopes
-    08-profiles-and-scenarios.md  # Conformance profiles
-    09-security-and-stability.md  # Security guarantees and freeze points
+    00-overview.html       # Scope, design goals, protocol shape
+    01-identity.html       # Sovereign identity and key derivation
+    02-authentication.html # Signed requests and replay protection
+    03-storage.html        # Encrypted vault model
+    04-agent-safety.html   # Intent, grants, approvals, egress
+    05-d2d.html            # Dina-to-Dina encrypted messaging
+    06-trust.html          # Trust Network on AT Protocol
+    07-interaction.html    # Semantic operations and response envelopes
+    08-profiles-and-scenarios.html  # Conformance profiles
+    09-security-and-stability.html  # Security guarantees and freeze points
   schemas/               # Machine-readable JSON schemas
     capability-advertisement.json
     capability-negotiation.json
@@ -81,20 +81,20 @@ protocol/
     approval-request.json
     response-envelope.json
   examples/              # Example JSON payloads
-  dina-protocol.md       # Monolithic narrative reference
-  agent-executor.md      # Agent executor profile spec
-  agent-executor-checklist.md  # Conformance checklist for executors
-  test-matrix.md         # Interoperability test matrix
+  dina-protocol.html     # Monolithic narrative reference
+  agent-executor.html    # Agent executor profile spec
+  agent-executor-checklist.html  # Conformance checklist for executors
+  test-matrix.html       # Interoperability test matrix
 ```
 
 ---
 
 ## Reading Order
 
-1. Start with [00-overview.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html) for scope, design goals, and protocol shape.
-2. Read chapters [01](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html) through [07](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html) for the full protocol specification.
-3. Read [08-profiles-and-scenarios.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html) to understand conformance targets.
-4. Read [09-security-and-stability.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html) for security guarantees and remaining freeze points.
+1. Start with [00-overview](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html) for scope, design goals, and protocol shape.
+2. Read chapters [01-identity](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html) through [07-interaction](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html) for the full protocol specification.
+3. Read [08-profiles-and-scenarios](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html) to understand conformance targets.
+4. Read [09-security-and-stability](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html) for security guarantees and remaining freeze points.
 5. Use the [schemas](https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/) and [examples](https://rajmohanutopai.github.io/dina-protocol/protocol/examples/) to build validators and interop tests.
 6. Use the [test matrix](https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html) to verify conformance.
 
