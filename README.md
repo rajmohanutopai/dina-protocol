@@ -91,12 +91,16 @@ protocol/
 
 ## Reading Order
 
-1. Start with [00-overview](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html) for scope, design goals, and protocol shape.
-2. Read chapters [01-identity](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html) through [07-interaction](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html) for the full protocol specification.
-3. Read [08-profiles-and-scenarios](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html) to understand conformance targets.
-4. Read [09-security-and-stability](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html) for security guarantees and remaining freeze points.
-5. Use the [schemas](https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/) and [examples](https://rajmohanutopai.github.io/dina-protocol/protocol/examples/) to build validators and interop tests.
-6. Use the [test matrix](https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html) to verify conformance.
+**Start here:** [The Complete Dina Protocol](https://rajmohanutopai.github.io/dina-protocol/protocol/dina-protocol.html) -- the full protocol in a single document covering all 7 layers, conformance profiles, and freeze points.
+
+For the chapter-by-chapter breakdown:
+
+1. [00-overview](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html) -- scope, design goals, and protocol shape.
+2. [01-identity](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html) through [07-interaction](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html) -- the full protocol specification.
+3. [08-profiles-and-scenarios](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html) -- conformance targets.
+4. [09-security-and-stability](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html) -- security guarantees and remaining freeze points.
+5. [schemas](https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/) and [examples](https://rajmohanutopai.github.io/dina-protocol/protocol/examples/) -- build validators and interop tests.
+6. [test matrix](https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html) -- verify conformance.
 
 ---
 
