@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 Trust — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="06-trust">06 Trust</h1>
+<p>This chapter defines the public trust layer, required record families, query semantics, and privacy boundaries.</p>
+<h2 id="purpose">Purpose</h2>
+<p>Trust defines how Dina-compatible systems publish verifiable outcomes and query world trust.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible trust layer MUST support:</p>
+<ul>
+<li>attributable signed trust records</li>
+<li>public indexing</li>
+<li>retraction or revocation</li>
+<li>subject resolution</li>
+<li>queryable trust profiles</li>
+</ul>
+<h2 id="write-path">Write Path</h2>
+<p>The intended Dina trust write model is:</p>
+<ul>
+<li>Home Nodes publish signed records to an AT Protocol PDS</li>
+<li>a relay and indexer ingest those records</li>
+<li>AppViews serve read-side query results</li>
+</ul>
+<p>The current reference implementation already has:</p>
+<ul>
+<li>PDS publishing through XRPC</li>
+<li><code>did:plc</code>-backed repo writes</li>
+<li>AppView-oriented query handlers</li>
+</ul>
+<h2 id="collection-namespace">Collection Namespace</h2>
+<p>The protocol trust namespace is <code>com.dina.trust.*</code>.</p>
+<p>The current broader design already includes a large set of collections, including families such as:</p>
+<ul>
+<li>attestation</li>
+<li>vouch</li>
+<li>endorsement</li>
+<li>flag</li>
+<li>reply</li>
+<li>reaction</li>
+<li>reportRecord</li>
+<li>revocation</li>
+<li>delegation</li>
+<li>collection</li>
+<li>media</li>
+<li>subject</li>
+<li>amendment</li>
+<li>verification</li>
+<li>reviewRequest</li>
+<li>comparison</li>
+<li>subjectClaim</li>
+<li>trustPolicy</li>
+<li>notificationPrefs</li>
+</ul>
+<p>The protocol MUST freeze at least a minimal required subset for 1.0.</p>
+<p>Recommended minimal core subset:</p>
+<ul>
+<li><code>com.dina.trust.attestation</code></li>
+<li><code>com.dina.trust.vouch</code></li>
+<li><code>com.dina.trust.flag</code></li>
+<li><code>com.dina.trust.revocation</code></li>
+<li><code>com.dina.trust.verification</code></li>
+</ul>
+<h2 id="read-contract">Read Contract</h2>
+<p>A Dina-compatible AppView SHOULD expose read-side queries for:</p>
+<ul>
+<li>resolve profile</li>
+<li>search trust</li>
+<li>fetch attestations</li>
+<li>fetch graph or neighborhood</li>
+</ul>
+<p>The reference implementation already exposes local Home Node handlers that proxy profile resolve and search to an AppView.</p>
+<h2 id="trust-score-semantics">Trust Score Semantics</h2>
+<p>The protocol MUST separate:</p>
+<ul>
+<li>record interoperability</li>
+<li>score algorithm interoperability</li>
+</ul>
+<p>Write interoperability requires a stable record namespace and shape.</p>
+<p>Read interoperability requires that a trust profile can at least expose:</p>
+<ul>
+<li>trust score</li>
+<li>confidence</li>
+<li>ring or classification</li>
+<li>evidence summary</li>
+<li>active flags or warnings</li>
+</ul>
+<p>Exact scoring algorithms, including EigenTrust-style convergence, SHOULD be published as profile definitions rather than assumed to be globally frozen at the protocol core.</p>
+<h2 id="privacy-rule">Privacy Rule</h2>
+<p>The Trust Network MUST NOT become a backdoor for private vault disclosure.</p>
+<p>Only explicitly publishable, signed, public trust records belong in the trust layer.</p>
+</body>
+</html>

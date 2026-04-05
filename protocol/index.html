@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dina Protocol — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="dina-protocol">Dina Protocol</h1>
+<p>Status: draft, reference-implementation-driven</p>
+<p>This directory contains the Dina protocol in split chapter form plus machine-readable schemas.</p>
+<h2 id="structure">Structure</h2>
+<h3 id="spec">Spec</h3>
+<ul>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html">00-overview.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html">01-identity.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/02-authentication.html">02-authentication.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/03-storage.html">03-storage.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/04-agent-safety.html">04-agent-safety.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/05-d2d.html">05-d2d.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/06-trust.html">06-trust.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html">07-interaction.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html">08-profiles-and-scenarios.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html">09-security-and-stability.md</a></li>
+</ul>
+<h3 id="schemas">Schemas</h3>
+<ul>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/capability-advertisement.json">capability-advertisement.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/capability-negotiation.json">capability-negotiation.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/auth-envelope.json">auth-envelope.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/d2d-envelope.json">d2d-envelope.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/agent-intent.json">agent-intent.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/approval-request.json">approval-request.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/response-envelope.json">response-envelope.json</a></li>
+</ul>
+<h3 id="examples">Examples</h3>
+<ul>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/index.html">README.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/capability-advertisement.example.json">capability-advertisement.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/agent-executor-capability.example.json">agent-executor-capability.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/agent-intent.example.json">agent-intent.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/capability-negotiation.example.json">capability-negotiation.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/auth-envelope.example.json">auth-envelope.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/d2d-envelope.example.json">d2d-envelope.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/approval-request.example.json">approval-request.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/response-envelope.example.json">response-envelope.example.json</a></li>
+</ul>
+<h3 id="conformance">Conformance</h3>
+<ul>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html">test-matrix.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/agent-executor.html">agent-executor.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/agent-executor-checklist.html">agent-executor-checklist.md</a></li>
+</ul>
+<h2 id="reading-order">Reading Order</h2>
+<ol>
+<li>Read <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html">00-overview.md</a>.</li>
+<li>Read <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html">01-identity.md</a> through <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html">07-interaction.md</a>.</li>
+<li>Use <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html">08-profiles-and-scenarios.md</a> to understand conformance targets.</li>
+<li>Use <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html">09-security-and-stability.md</a> to understand guarantees and remaining freeze points.</li>
+<li>Use <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/index.html">examples/README.md</a> and <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html">test-matrix.md</a> to build validators and interop tests.</li>
+</ol>
+<h2 id="compatibility-model">Compatibility Model</h2>
+<p>The protocol is intentionally shaped as:<br />
+- minimal frozen core<br />
+- named profiles<br />
+- namespaced extensions<br />
+- capability discovery and negotiation</p>
+<p>That keeps the interoperable base stable without forcing every Dina-compatible implementation into one product shape.</p>
+<p>The monolithic narrative reference remains at <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/dina-protocol.html">dina-protocol.md</a>.</p>
+</body>
+</html>

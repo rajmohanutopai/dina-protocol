@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dina Protocol Test Matrix — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="dina-protocol-test-matrix">Dina Protocol Test Matrix</h1>
+<p>Status: draft</p>
+<p>This matrix defines the minimum interoperability checks a Dina-compatible implementation should pass.</p>
+<h2 id="1-core-conformance-matrix">1. Core Conformance Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Area</th>
+<th>Check</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>Identity</td>
+<td>Restore the same mnemonic in two implementations</td>
+<td>Same canonical root key material and same derived signing keys</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Identity</td>
+<td>Resolve a published DID document</td>
+<td>Same verification methods and service endpoints are understood</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Authentication</td>
+<td>Verify the canonical signed payload</td>
+<td>Receiver validates signature, timestamp, and nonce correctly</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Authentication</td>
+<td>Reject replayed request</td>
+<td>Second use of same nonce/signature is rejected</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>Storage</td>
+<td>Export logical vault data from implementation A and import into B</td>
+<td>Records, provenance, trust fields, and persona metadata survive logically intact</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>Agent Safety</td>
+<td>Submit portable approval request</td>
+<td>Receiver can render and process approval state correctly</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>D2D</td>
+<td>Send a basic <code>coordination.request</code> envelope</td>
+<td>Receiver parses, authenticates, and routes the envelope</td>
+</tr>
+<tr>
+<td>C8</td>
+<td>D2D</td>
+<td>Execute generic request-state lifecycle</td>
+<td>Both sides agree on request mode, status transitions, and required fields</td>
+</tr>
+<tr>
+<td>C9</td>
+<td>Trust</td>
+<td>Publish one mandatory trust record from one implementation and query from another</td>
+<td>AppView/consumer sees the record under the correct core namespace</td>
+</tr>
+<tr>
+<td>C10</td>
+<td>Interaction</td>
+<td>Map a local UI command to <code>answer_now</code></td>
+<td>Receiver or local runtime preserves semantic operation contract</td>
+</tr>
+<tr>
+<td>C11</td>
+<td>Interaction</td>
+<td>Parse portable response envelope</td>
+<td>Client renders the same typed result shape</td>
+</tr>
+<tr>
+<td>C12</td>
+<td>Capability</td>
+<td>Fetch capability advertisement</td>
+<td>Remote peer understands supported versions, profiles, and limits</td>
+</tr>
+<tr>
+<td>C13</td>
+<td>Capability</td>
+<td>Negotiate a common subset</td>
+<td>Interaction uses selected common subset rather than failing implicitly</td>
+</tr>
+<tr>
+<td>C14</td>
+<td>Agent Compliance</td>
+<td>Verify an implementation claiming <code>agent-executor</code> profile</td>
+<td>It authenticates, declares intent, and operates only within granted session scope</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-required-core-freeze-point-tests">2. Required Core Freeze-Point Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Freeze Point</th>
+<th>Test</th>
+<th>Pass Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Root key material profile</td>
+<td>Generate mnemonic and compare downstream key derivation across implementations</td>
+<td>Same canonical root key material and same derived root signing key</td>
+</tr>
+<tr>
+<td>D2D request-state plane</td>
+<td>Execute <code>inline_preferred</code>, <code>async</code>, and <code>subscription</code> requests</td>
+<td>Both sides agree on request mode, lifecycle transitions, and timestamps</td>
+</tr>
+<tr>
+<td>Trust core subset</td>
+<td>Publish/query attestation, vouch, flag, revocation, verification</td>
+<td>All five core collections interoperate</td>
+</tr>
+<tr>
+<td>Capability discovery and negotiation</td>
+<td>Exchange advertisement and live negotiation</td>
+<td>Selected protocol subset is explicit and enforceable</td>
+</tr>
+<tr>
+<td>Interaction operation registry</td>
+<td>Execute core operations against one implementation from another</td>
+<td>Semantic contract is preserved independent of UI command spelling</td>
+</tr>
+<tr>
+<td>Response envelope schema</td>
+<td>Exchange all seven core response kinds</td>
+<td>Receiver accepts and renders all supported core types</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-profile-tests">3. Profile Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Check</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home Node</td>
+<td>Full core stack plus trust publish/query and D2D</td>
+<td>End-to-end interop succeeds</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>Pair, sign, and operate through Home Node</td>
+<td>Device can authenticate and invoke core operations</td>
+</tr>
+<tr>
+<td>Agent Executor</td>
+<td>Consume delegated work without owning identity or policy</td>
+<td>Executor acts within granted scope only</td>
+</tr>
+<tr>
+<td>Provider Dina</td>
+<td>Accept <code>request_service</code> and return provider result</td>
+<td>Service-facing interop works with correct lifecycle</td>
+</tr>
+<tr>
+<td>Trust AppView</td>
+<td>Index and serve trust records</td>
+<td>Read-side trust interop works</td>
+</tr>
+<tr>
+<td>Bridge</td>
+<td>Map non-native channel into Dina interaction contract</td>
+<td>Bridge preserves semantic operation and disclosure state</td>
+</tr>
+<tr>
+<td>Mobile Home Node</td>
+<td>Operate through relay/AppView-backed profile</td>
+<td>Mobile profile remains interoperable despite partial delegation</td>
+</tr>
+<tr>
+<td>Encrypted Vault Portability</td>
+<td>Import encrypted vault file directly</td>
+<td>Only applicable if both sides claim same encrypted-vault profile</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-scenario-interoperability-tests">4. Scenario Interoperability Tests</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Scenario</th>
+<th>Semantic Operations</th>
+<th>Pass Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>Personal memory</td>
+<td><code>remember_context</code>, <code>answer_now</code></td>
+<td>Memory stored in one implementation can be exported/imported and later queried correctly</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Bus ETA</td>
+<td><code>answer_now</code> + <code>request_service</code></td>
+<td>Caller receives typed status response after provider-side execution</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Social coordination</td>
+<td><code>communicate_person</code></td>
+<td>Message reaches remote Dina or explicit fallback path</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Provider request</td>
+<td><code>request_service</code></td>
+<td>Provider Dina can accept, run, and return result or failure state</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>Durable task</td>
+<td><code>delegate_task</code></td>
+<td>Async task lifecycle is inspectable and terminal result is portable</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Monitoring</td>
+<td><code>watch_condition</code></td>
+<td>Watch can be created, updated, completed, cancelled, and failed explicitly</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>Briefing/failure delivery</td>
+<td><code>deliver_briefing</code>, <code>deliver_failure</code></td>
+<td>Dina-initiated delivery is surfaced without ambiguity</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>Trust query</td>
+<td><code>answer_now</code> or <code>propose_plan</code> + trust read</td>
+<td>Evidence-aware trust result is rendered portably</td>
+</tr>
+<tr>
+<td>S9</td>
+<td>Agent-mediated execution</td>
+<td><code>delegate_task</code> through a compliant executor</td>
+<td>Home Node retains authority while executor remains profile-scoped</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-negative-and-fallback-tests">5. Negative and Fallback Tests</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Case</th>
+<th>Expected Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N1</td>
+<td>Unsupported optional extension</td>
+<td>Receiver ignores or declines extension explicitly; core interaction still proceeds if possible</td>
+</tr>
+<tr>
+<td>N2</td>
+<td>Unsupported profile</td>
+<td>Negotiation falls back to common subset or rejects clearly</td>
+</tr>
+<tr>
+<td>N3</td>
+<td>Unknown response extension</td>
+<td>Client still renders core response fields</td>
+</tr>
+<tr>
+<td>N4</td>
+<td>Missing required D2D lifecycle field</td>
+<td>Receiver rejects as invalid protocol payload</td>
+</tr>
+<tr>
+<td>N5</td>
+<td>Expired approval request</td>
+<td>Action is blocked until renewed or replaced</td>
+</tr>
+<tr>
+<td>N6</td>
+<td>Replay of signed request or D2D message</td>
+<td>Receiver rejects replay and records audit event</td>
+</tr>
+<tr>
+<td>N7</td>
+<td>Agent claims <code>agent-executor</code> but bypasses approval or scope</td>
+<td>Implementation is not conformant with the executor profile</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-release-gate-for-protocol-10">6. Release Gate For Protocol 1.0</h2>
+<p>Before calling Dina Protocol 1.0 stable, at least these should be true:</p>
+<ol>
+<li>All six core freeze-point tests pass across at least two independent implementations.</li>
+<li>Capability advertisement and negotiation are machine-readable and stable.</li>
+<li>The seven core response kinds are accepted and rendered portably.</li>
+<li>The five mandatory trust collections interoperate through at least one AppView implementation.</li>
+<li>One provider-style D2D request and one delegated-task flow work end to end across implementation boundaries.</li>
+</ol>
+</body>
+</html>

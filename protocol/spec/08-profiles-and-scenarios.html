@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>08 Profiles And Scenarios — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="08-profiles-and-scenarios">08 Profiles And Scenarios</h1>
+<p>This chapter defines conformance profiles and scenario coverage for evaluating Dina-compatible implementations.</p>
+<h2 id="conformance-profiles">Conformance Profiles</h2>
+<p>Not every implementation must implement every layer.</p>
+<p>The protocol SHOULD define conformance profiles.</p>
+<p>Implementations SHOULD advertise their supported profile identifiers through the capability discovery layer.</p>
+<h2 id="home-node-profile">Home Node Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>D2D</li>
+<li>Trust publishing or proxying</li>
+<li>Interaction Contract</li>
+</ul>
+<p>This is the fullest Dina implementation.</p>
+<h2 id="device-profile">Device Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>device identity</li>
+<li>request signing</li>
+<li>pairing</li>
+<li>selected interaction operations</li>
+</ul>
+<p>May delegate storage and D2D authority to a Home Node.</p>
+<h2 id="agent-executor-profile">Agent Executor Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Authentication</li>
+<li>Agent Safety contract</li>
+<li>selected interaction semantics</li>
+</ul>
+<p>May act only through a Home Node and does not own Dina identity or vault authority.</p>
+<h2 id="agent-compliance-model">Agent Compliance Model</h2>
+<p>The protocol SHOULD be explicit about what it means for an agent to be Dina-protocol-compliant.</p>
+<p>Not every agent that can call a Dina endpoint is Dina-protocol-compliant.</p>
+<p>At minimum, the protocol distinguishes:</p>
+<ol>
+<li>Dina-compatible agent executor</li>
+<li>implements the <code>agent-executor</code> profile</li>
+<li>authenticates using Dina-compatible auth</li>
+<li>declares intent and caller identity</li>
+<li>obeys session, grant, approval, and egress controls</li>
+<li>
+<p>consumes or produces supported interaction semantics through a Home Node</p>
+</li>
+<li>
+<p>Dina-aware agent</p>
+</li>
+<li>can talk to a Dina-compatible Home Node or bridge</li>
+<li>but does not itself implement the required executor profile contract</li>
+<li>
+<p>is integration-capable, not protocol-conformant</p>
+</li>
+<li>
+<p>Sovereign Dina implementation</p>
+</li>
+<li>implements a fuller profile such as <code>home-node</code>, <code>provider-dina</code>, or <code>mobile-home-node</code></li>
+<li>may also host or route work to one or more compliant agent executors</li>
+</ol>
+<p>An agent therefore SHOULD NOT be described simply as \"Dina-compatible\" without a profile qualifier.</p>
+<p>Recommended language is:</p>
+<ul>
+<li>\"Dina-compatible agent executor\"</li>
+<li>\"Dina-aware external agent\"</li>
+<li>\"Dina-compatible Home Node\"</li>
+</ul>
+<p>This avoids conflating:</p>
+<ul>
+<li>an executor that works under a Home Node's authority</li>
+<li>a sovereign Dina implementation</li>
+<li>a third-party tool integration that merely speaks some Dina-adjacent API</li>
+</ul>
+<h2 id="minimum-agent-executor-requirements">Minimum Agent Executor Requirements</h2>
+<p>To claim the <code>agent-executor</code> profile, an agent implementation SHOULD at minimum:</p>
+<ul>
+<li>advertise the <code>agent-executor</code> profile through capability discovery</li>
+<li>support Dina-compatible authentication</li>
+<li>propagate caller context containing principal, actor, origin, and auth mode</li>
+<li>declare semantic operations it can participate in</li>
+<li>honor session and grant boundaries</li>
+<li>surface approval-required actions instead of bypassing them</li>
+<li>preserve portable response-envelope semantics for the results it returns</li>
+<li>avoid claiming storage, D2D, or trust capabilities it does not implement</li>
+</ul>
+<p>An agent executor MAY be narrow.</p>
+<p>For example, an implementation may legitimately support only:</p>
+<ul>
+<li><code>delegate_task</code></li>
+<li><code>answer_now</code></li>
+<li><code>request_service</code></li>
+<li><code>status</code></li>
+</ul>
+<p>provided it advertises that subset honestly and negotiates against the remote common subset.</p>
+<h2 id="d2d-service-provider-profile">D2D Service / Provider Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>D2D endpoint or request endpoint</li>
+<li>selected interaction semantics</li>
+</ul>
+<p>May satisfy requests through direct lookup, internal tools, or delegated execution.</p>
+<h2 id="trust-appview-profile">Trust AppView Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Trust indexing</li>
+<li>trust query endpoints</li>
+</ul>
+<p>Does not need to implement vault storage or agent safety.</p>
+<h2 id="bridge-connector-profile">Bridge Connector Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Authentication to a Home Node</li>
+<li>selected <code>communicate_person</code>, <code>request_service</code>, and <code>watch_condition</code> semantics</li>
+<li>delivery over non-native channels such as email or chat</li>
+</ul>
+<p>This preserves interoperability without making bridges the protocol center.</p>
+<h2 id="mobile-home-node-profile">Mobile Home Node Profile</h2>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>D2D (via mailbox relay)</li>
+<li>Trust querying (via hosted AppView)</li>
+<li>Interaction Contract</li>
+</ul>
+<p>Delegates to hosted infrastructure:</p>
+<ul>
+<li>mailbox relay for offline D2D delivery</li>
+<li>AppView for Trust Network queries</li>
+<li>PDS for trust record publishing</li>
+</ul>
+<p>This profile enables zero-cost sovereign operation<br />
+on a mobile device with no user-managed server.</p>
+<h2 id="scenario-coverage">Scenario Coverage</h2>
+<p>The protocol should be judged against scenario families, not only transport primitives.</p>
+<h3 id="personal-memory">Personal Memory</h3>
+<p>Pattern:</p>
+<ul>
+<li>remember_context</li>
+<li>encrypted storage</li>
+<li>optional approvals</li>
+<li>later <code>answer_now</code> or <code>propose_plan</code></li>
+</ul>
+<h3 id="live-world-state-query">Live World-State Query</h3>
+<p>Pattern:</p>
+<ul>
+<li>answer_now</li>
+<li>context resolution</li>
+<li>provider or infrastructure request</li>
+<li>possible D2D or remote execution</li>
+<li>typed status response</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"What time will the bus reach here?"</li>
+</ul>
+<h3 id="social-coordination">Social Coordination</h3>
+<p>Pattern:</p>
+<ul>
+<li>communicate_person</li>
+<li>D2D preferred</li>
+<li>sharing policy</li>
+<li>approval if needed</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Tell Sancho I'll be 20 minutes late."</li>
+</ul>
+<h3 id="provider-request">Provider Request</h3>
+<p>Pattern:</p>
+<ul>
+<li>request_service</li>
+<li>provider Dina or API</li>
+<li>possible remote task or federated execution</li>
+<li>status or final result</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Ask the clinic whether the doctor is running late."</li>
+</ul>
+<h3 id="durable-delegated-work">Durable Delegated Work</h3>
+<p>Pattern:</p>
+<ul>
+<li>delegate_task</li>
+<li>executor routing</li>
+<li>async lifecycle</li>
+<li>callback or polling</li>
+<li>final structured result</li>
+</ul>
+<h3 id="monitoring">Monitoring</h3>
+<p>Pattern:</p>
+<ul>
+<li>watch_condition</li>
+<li>subscription or polling</li>
+<li>later notification</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Watch this bus and tell me when it is 5 minutes away."</li>
+</ul>
+<h3 id="briefing-and-proactive-delivery">Briefing and Proactive Delivery</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>deliver_briefing</code></li>
+<li><code>deliver_alert</code></li>
+<li><code>deliver_completion</code></li>
+<li><code>deliver_failure</code></li>
+<li>priority-ranked outbound delivery</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>morning briefing</li>
+<li>failed task that should not stay silent</li>
+<li>urgent reminder that became fiduciary</li>
+</ul>
+<h3 id="trust-query">Trust Query</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>answer_now</code> or <code>propose_plan</code></li>
+<li>trust lookup via AppView</li>
+<li>evidence-aware result</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Show me only items with verified provenance."</li>
+</ul>
+<h3 id="trust-publication">Trust Publication</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>publish_review</code>, <code>publish_vouch</code>, or <code>publish_flag</code></li>
+<li>signed public record</li>
+<li>AppView indexing</li>
+<li>retractable lifecycle</li>
+</ul>
+</body>
+</html>

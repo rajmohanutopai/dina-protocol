@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Executor Profile — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="agent-executor-profile">Agent Executor Profile</h1>
+<p>Status: draft</p>
+<p>This note explains what it means for an agent to claim Dina-protocol compliance as an executor.</p>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>The Dina protocol distinguishes between:</p>
+<ul>
+<li>sovereign Dina implementations</li>
+<li>compliant agent executors operating under a Home Node</li>
+<li>external agents that only integrate with Dina loosely</li>
+</ul>
+<p>This document is for the middle case.</p>
+<h2 id="2-what-an-agent-executor-is">2. What An Agent Executor Is</h2>
+<p>A Dina-compatible agent executor is not a sovereign Dina.</p>
+<p>It does not own:<br />
+- Home Node identity<br />
+- vault authority<br />
+- trust publication authority<br />
+- independent D2D authority unless separately implemented and advertised</p>
+<p>It does:<br />
+- authenticate to a Home Node or equivalent sovereign node<br />
+- declare intent before acting<br />
+- obey session, grant, approval, and egress controls<br />
+- return portable structured results<br />
+- truthfully advertise its supported protocol subset</p>
+<h2 id="3-what-it-is-not">3. What It Is Not</h2>
+<p>An agent executor is not compliant merely because it can:<br />
+- call one HTTP endpoint<br />
+- read one task payload<br />
+- post back a text result<br />
+- bypass approvals through an internal integration path</p>
+<p>That is Dina-aware integration, not executor-profile conformance.</p>
+<h2 id="4-minimum-compliance-requirements">4. Minimum Compliance Requirements</h2>
+<p>To claim the <code>agent-executor</code> profile, an implementation should satisfy all of the following.</p>
+<h3 id="41-identity-and-authentication">4.1 Identity and Authentication</h3>
+<ul>
+<li>expose a stable DID or equivalent authenticated principal recognized by the Home Node</li>
+<li>sign requests using Dina-compatible authentication</li>
+<li>support replay-safe request semantics</li>
+</ul>
+<h3 id="42-capability-advertisement">4.2 Capability Advertisement</h3>
+<ul>
+<li>advertise the <code>agent-executor</code> profile</li>
+<li>declare supported semantic operations honestly</li>
+<li>declare supported response-envelope versions and kinds</li>
+<li>declare limits and unsupported optional features explicitly</li>
+</ul>
+<h3 id="43-intent-declaration">4.3 Intent Declaration</h3>
+<ul>
+<li>declare intent before sensitive access or external action</li>
+<li>provide at least:</li>
+<li><code>agent_did</code></li>
+<li><code>action</code></li>
+<li><code>target</code></li>
+<li><code>persona_id</code> or persona scope</li>
+<li><code>trust_level</code></li>
+<li><code>constraints</code></li>
+<li>surface intent in a form the Home Node can evaluate portably</li>
+</ul>
+<h3 id="44-authority-boundaries">4.4 Authority Boundaries</h3>
+<ul>
+<li>operate only within granted session scope</li>
+<li>never self-grant broader access</li>
+<li>never bypass approval-required actions</li>
+<li>treat missing grant or denial as terminal for that action unless reauthorized</li>
+</ul>
+<h3 id="45-egress-and-safety">4.5 Egress and Safety</h3>
+<ul>
+<li>honor PII scrubbing and redaction requirements</li>
+<li>do not exfiltrate sensitive vault content outside allowed channels</li>
+<li>respect policy decisions made by the Home Node</li>
+</ul>
+<h3 id="46-result-contract">4.6 Result Contract</h3>
+<ul>
+<li>return results using the portable response envelope</li>
+<li>preserve <code>status</code> and <code>error</code> semantics clearly</li>
+<li>expose provenance or disclosure annotations when relevant</li>
+</ul>
+<h3 id="47-operational-honesty">4.7 Operational Honesty</h3>
+<ul>
+<li>do not claim storage, trust, D2D, or proactive-delivery support if not implemented</li>
+<li>do not claim provider or sovereign capabilities when acting only as an executor</li>
+</ul>
+<h2 id="5-narrow-executors-are-valid">5. Narrow Executors Are Valid</h2>
+<p>An executor may support only a small subset of operations.</p>
+<p>Example valid subset:<br />
+- <code>delegate_task</code><br />
+- <code>answer_now</code><br />
+- <code>request_service</code><br />
+- <code>inspect_status</code></p>
+<p>That is acceptable if the subset is advertised clearly and negotiated honestly.</p>
+<h2 id="6-relationship-to-the-home-node">6. Relationship To The Home Node</h2>
+<p>The Home Node remains the sovereign authority.</p>
+<p>The executor is subordinate in protocol terms.</p>
+<p>The Home Node owns:<br />
+- identity<br />
+- vaults<br />
+- approvals<br />
+- trust decisions<br />
+- policy<br />
+- final authority on outbound action</p>
+<p>The executor supplies:<br />
+- reasoning<br />
+- tool execution<br />
+- external lookups within granted scope<br />
+- structured outputs</p>
+<h2 id="7-required-artifacts">7. Required Artifacts</h2>
+<p>An executor implementation should be able to point to:<br />
+- a capability advertisement<br />
+- an intent declaration schema or payload<br />
+- its supported response envelope version<br />
+- a conformance checklist against the executor profile</p>
+<h2 id="8-suggested-validation-path">8. Suggested Validation Path</h2>
+<ol>
+<li>validate the executor's capability advertisement</li>
+<li>validate its intent payloads</li>
+<li>verify that approvals are surfaced rather than bypassed</li>
+<li>verify that denied or expired scope blocks action</li>
+<li>verify that returned results conform to the response envelope</li>
+<li>verify that unsupported optional features are declined explicitly</li>
+</ol>
+<h2 id="9-normative-references-in-this-protocol-set">9. Normative References In This Protocol Set</h2>
+<ul>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/04-agent-safety.html">04-agent-safety.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html">08-profiles-and-scenarios.md</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/agent-intent.json">agent-intent.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/examples/agent-executor-capability.example.json">agent-executor-capability.example.json</a></li>
+<li><a href="https://rajmohanutopai.github.io/dina-protocol/protocol/agent-executor-checklist.html">agent-executor-checklist.md</a></li>
+</ul>
+</body>
+</html>

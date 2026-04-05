@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 Agent Safety — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="04-agent-safety">04 Agent Safety</h1>
+<p>This chapter defines sessions, approvals, intent evaluation, PII controls, and audit requirements for agent interaction with Dina.</p>
+<h2 id="purpose">Purpose</h2>
+<p>Agent Safety defines how agents interact with personal data and external systems without collapsing user sovereignty.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible safety layer MUST provide:</p>
+<ul>
+<li>session-scoped access</li>
+<li>approval requests</li>
+<li>scoped grants</li>
+<li>intent evaluation</li>
+<li>egress controls</li>
+<li>PII scrubbing</li>
+<li>auditability</li>
+</ul>
+<h2 id="session-and-grant-model">Session and Grant Model</h2>
+<p>The reference implementation already models:</p>
+<ul>
+<li>named agent sessions</li>
+<li>active vs ended session state</li>
+<li>grants scoped to a session</li>
+<li>revocation of all grants on session end</li>
+</ul>
+<p>An interoperable session model SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>name</code></li>
+<li><code>agent_did</code></li>
+<li><code>status</code></li>
+<li><code>created_at</code></li>
+<li><code>last_activity_at</code></li>
+<li><code>ended_at</code></li>
+</ul>
+<p>An interoperable access grant SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>client_did</code></li>
+<li><code>persona_id</code></li>
+<li><code>session_id</code></li>
+<li><code>scope</code></li>
+<li><code>expires_at</code></li>
+<li><code>granted_by</code></li>
+<li><code>reason</code></li>
+</ul>
+<p>Grant scopes SHOULD at least distinguish:</p>
+<ul>
+<li>single</li>
+<li>session</li>
+</ul>
+<h2 id="approval-model">Approval Model</h2>
+<p>An approval request MUST be portable across implementations.</p>
+<p>Minimum approval fields SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>type</code></li>
+<li><code>client_did</code></li>
+<li><code>persona_id</code></li>
+<li><code>session_id</code></li>
+<li><code>action</code></li>
+<li><code>scope</code></li>
+<li><code>status</code></li>
+<li><code>reason</code></li>
+<li><code>preview</code></li>
+<li><code>granted_by</code></li>
+<li><code>expires_at</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<p>The reference implementation already exposes this shape.</p>
+<p>A draft machine-readable schema for this contract lives in:</p>
+<ul>
+<li><code>schemas/approval-request.json</code></li>
+</ul>
+<p>Approval types currently include:</p>
+<ul>
+<li><code>persona_access</code></li>
+<li><code>action_intent</code></li>
+</ul>
+<h2 id="intent-evaluation">Intent Evaluation</h2>
+<p>A Dina-compatible agent safety layer MUST require agents to declare intent.</p>
+<p>The current reference intent model is:</p>
+<ul>
+<li><code>agent_did</code></li>
+<li><code>action</code></li>
+<li><code>target</code></li>
+<li><code>persona_id</code></li>
+<li><code>trust_level</code></li>
+<li><code>constraints</code></li>
+</ul>
+<p>The current reference decision model is:</p>
+<ul>
+<li><code>allowed</code></li>
+<li><code>reason</code></li>
+<li><code>audit</code></li>
+</ul>
+<p>A draft machine-readable schema for executor intent declaration lives in:</p>
+<ul>
+<li><code>schemas/agent-intent.json</code></li>
+</ul>
+<h2 id="safety-rules">Safety Rules</h2>
+<p>At protocol level, Dina safety has four core principles:</p>
+<ul>
+<li>safe reads and reasoning may pass silently</li>
+<li>risky actions require review</li>
+<li>untrusted agents are denied by default</li>
+<li>raw sensitive data must not leave the node without policy checks</li>
+</ul>
+<p>The reference gatekeeper already treats actions such as:</p>
+<ul>
+<li><code>send_email</code></li>
+<li><code>transfer_money</code></li>
+<li><code>share_data</code></li>
+</ul>
+<p>as risky actions that require explicit user review.</p>
+<h2 id="pii-scrubbing">PII Scrubbing</h2>
+<p>A Dina-compatible implementation MUST support PII scrubbing before cloud or third-party egress.</p>
+<p>The reference implementation currently provides:</p>
+<ul>
+<li>Tier 1: regex-based scrubbing for structured PII</li>
+<li>Tier 2: Brain-assisted structured or NER-assisted scrubbing</li>
+</ul>
+<p>The protocol SHOULD allow additional tiers, but MUST preserve the contract that scrubbed text can be safely passed onward and later rehydrated only within an authorized local context.</p>
+<h2 id="audit">Audit</h2>
+<p>Every approval, denial, sensitive access, or denied egress SHOULD be auditable.</p>
+<p>This is already present in the reference implementation and should remain a required interoperability expectation for serious implementations.</p>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>00 Overview — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="00-overview">00 Overview</h1>
+<p>This chapter defines the shared protocol frame that all Dina-compatible implementations build on.</p>
+<h2 id="scope">Scope</h2>
+<p>Dina the product is a sovereign personal AI.</p>
+<p>Dina the protocol is the standard for how humans and their software:</p>
+<ul>
+<li>identify themselves</li>
+<li>authenticate</li>
+<li>protect personal data</li>
+<li>authorize agent access</li>
+<li>coordinate with other sovereign identities</li>
+<li>publish and query trust</li>
+<li>express interactions in a portable way</li>
+</ul>
+<p>This protocol is not only a wire format. It is a layered interoperability contract.</p>
+<h2 id="design-goals">Design Goals</h2>
+<p>The protocol exists so that:</p>
+<ul>
+<li>a Go, Rust, Swift, Python, or browser-based implementation can interoperate</li>
+<li>a managed hosted Dina and a self-hosted Dina can still speak the same contracts</li>
+<li>a specialist agent can plug into Dina without owning Dina's identity or policy layer</li>
+<li>a D2D request can be fulfilled by a remote Dina regardless of its internal executor</li>
+<li>the Trust Network remains portable across AppViews and Home Nodes</li>
+<li>user interaction semantics remain stable even when implementations differ internally</li>
+<li>implementations can advertise what they support before attempting advanced interop</li>
+<li>optional features can evolve without fragmenting the core protocol</li>
+</ul>
+<h2 id="relationship-to-the-interaction-architecture">Relationship to the Interaction Architecture</h2>
+<p>This protocol is grounded in the interaction architecture already defined for Dina:</p>
+<ul>
+<li>the full interaction inventory</li>
+<li>the consolidated domain model</li>
+<li>the D2D domain model</li>
+<li>the interaction topology model</li>
+<li>context resolution</li>
+<li>response formatting</li>
+</ul>
+<p>Those documents answer:</p>
+<ul>
+<li>what users and Dinas need to do</li>
+<li>who they interact with</li>
+<li>how requests are grounded</li>
+<li>how results are rendered</li>
+</ul>
+<p>This protocol document answers a different question:</p>
+<ul>
+<li>what independent implementations must agree on to interoperate across all of that</li>
+</ul>
+<h2 id="conformance-language">Conformance Language</h2>
+<p>The keywords MUST, SHOULD, MAY, MUST NOT, and SHOULD NOT are used in the RFC sense.</p>
+<p>This document distinguishes:</p>
+<ul>
+<li>Protocol contract: what any conforming implementation must do</li>
+<li>Reference behavior: what the current Dina implementation does today</li>
+<li>Open freeze point: a place where the reference implementation still needs one protocol choice to be standardized before a 1.0 release</li>
+<li>Core protocol: the minimum frozen subset every conforming implementation shares</li>
+<li>Profile: a named, optional capability bundle built on top of the core protocol</li>
+<li>Extension: a namespaced optional feature that may be ignored when unsupported</li>
+<li>Profile-qualified compliance: an implementation is Dina-protocol-compliant only with respect to one or more declared profiles, not by vague association with Dina</li>
+</ul>
+<h2 id="protocol-shape">Protocol Shape</h2>
+<p>The Dina protocol should be strict only where interoperability actually requires strictness.</p>
+<p>Its shape is:</p>
+<ul>
+<li>minimal frozen core</li>
+<li>named conformance profiles</li>
+<li>namespaced extensions</li>
+<li>capability discovery and negotiation</li>
+<li>layered interoperability contracts</li>
+</ul>
+<h3 id="minimal-frozen-core">Minimal Frozen Core</h3>
+<p>The core protocol should freeze only the pieces that must be identical across implementations:</p>
+<ul>
+<li>identity derivation</li>
+<li>signed request authentication</li>
+<li>minimum D2D envelope and lifecycle semantics</li>
+<li>minimum trust namespace subset</li>
+<li>minimum semantic operation set</li>
+<li>minimum response envelope core</li>
+</ul>
+<p>Everything else should remain profile-based or extensible.</p>
+<h3 id="profiles">Profiles</h3>
+<p>Profiles are named bundles of additional behavior on top of the core protocol.</p>
+<p>Examples include:</p>
+<ul>
+<li>Home Node</li>
+<li>Device</li>
+<li>Agent Executor</li>
+<li>Provider Dina</li>
+<li>AppView</li>
+<li>Bridge</li>
+<li>Mobile Home Node</li>
+<li>encrypted vault portability</li>
+</ul>
+<p>Profiles allow an implementation to be fully Dina-compatible without pretending to support every optional behavior.</p>
+<h3 id="extensions-and-namespacing">Extensions and Namespacing</h3>
+<p>The protocol SHOULD allow growth through explicit extension points.</p>
+<p>Extensions SHOULD be:</p>
+<ul>
+<li>namespaced</li>
+<li>discoverable</li>
+<li>ignorable when unsupported</li>
+<li>non-breaking to the core protocol</li>
+</ul>
+<p>Unknown optional extensions MUST NOT cause protocol failure by themselves.</p>
+<p>Failure should occur only when:</p>
+<ul>
+<li>the remote side requires a capability the local side does not support</li>
+<li>or no acceptable common profile can be negotiated</li>
+</ul>
+<h3 id="capability-discovery-and-negotiation">Capability Discovery and Negotiation</h3>
+<p>Conforming implementations SHOULD support both:</p>
+<ul>
+<li>static capability advertisement</li>
+<li>live capability negotiation</li>
+</ul>
+<p>Static capability advertisement answers:</p>
+<ul>
+<li>what this implementation can do in general</li>
+<li>which profiles it implements</li>
+<li>which optional features it understands</li>
+</ul>
+<p>Live capability negotiation answers:</p>
+<ul>
+<li>what these two parties will use for this interaction</li>
+</ul>
+<p>At minimum, a capability advertisement SHOULD declare:</p>
+<ul>
+<li>supported protocol versions</li>
+<li>implemented conformance profiles</li>
+<li>supported authentication methods</li>
+<li>supported D2D message families</li>
+<li>supported semantic operations</li>
+<li>supported request modes and lifecycle states</li>
+<li>supported response envelope versions and response kinds</li>
+<li>supported response extensions and disclosure annotations</li>
+<li>supported trust namespace subsets</li>
+<li>delivery capabilities such as mailbox relay or proactive delivery</li>
+<li>optional storage portability profiles</li>
+<li>relevant limits such as payload size, attachment size, or timeout windows</li>
+</ul>
+<p>Capability advertisement MAY be published through:</p>
+<ul>
+<li>DID service metadata</li>
+<li>a dedicated capability document</li>
+<li>a service discovery endpoint</li>
+<li>another equivalent discovery mechanism</li>
+</ul>
+<p>The protocol should standardize the semantics of capability discovery, not require one single UI or deployment shape.</p>
+<p>Draft machine-readable artifacts for this layer live in:</p>
+<ul>
+<li><code>schemas/capability-advertisement.json</code></li>
+<li><code>schemas/capability-negotiation.json</code></li>
+</ul>
+<p>Live negotiation SHOULD choose, for a given interaction:</p>
+<ul>
+<li>the protocol version</li>
+<li>the authentication method</li>
+<li>the message family or request family</li>
+<li>the request mode</li>
+<li>the response envelope version</li>
+<li>any required extensions</li>
+<li>fallback behavior if advanced features are unavailable</li>
+</ul>
+<p>Two Dina-compatible implementations MUST be able to fall back to their common subset whenever possible.</p>
+<p>An implementation MUST be able to say:</p>
+<ul>
+<li>what it supports</li>
+<li>what it requires</li>
+<li>what it selected for this interaction</li>
+</ul>
+<p>without forcing the remote side to guess.</p>
+<h3 id="protocol-layers">Protocol Layers</h3>
+<p>Dina has six core protocol layers and one cross-cutting interoperability layer.</p>
+<ol>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>Dina-to-Dina Communication</li>
+<li>Trust Network</li>
+<li>Interaction Contract</li>
+</ol>
+<p>The first six are the infrastructure core.</p>
+<p>The seventh is the application interoperability layer that makes all higher-level scenarios portable across implementations.</p>
+<h2 id="core-entities">Core Entities</h2>
+<p>The protocol recognizes the following principal types:</p>
+<ul>
+<li>Human root identity</li>
+<li>Home Node</li>
+<li>Device</li>
+<li>Internal service</li>
+<li>Agent executor</li>
+<li>Remote Dina</li>
+<li>Provider or organization Dina</li>
+<li>Trust AppView</li>
+</ul>
+<p>The protocol also recognizes the following counterparty classes:</p>
+<ul>
+<li>Person</li>
+<li>Provider</li>
+<li>Institution</li>
+<li>Public infrastructure</li>
+<li>Device or IoT system</li>
+<li>Agent or executor</li>
+</ul>
+<p>These matter because the same user request may route through different fulfillment topologies while preserving the same external contract.</p>
+<p>Every conforming implementation SHOULD also expose enough capability metadata for another Dina-compatible implementation to determine:</p>
+<ul>
+<li>which principal and counterparty roles it can play</li>
+<li>which profiles it implements</li>
+<li>which optional features are safe to attempt</li>
+</ul>
+</body>
+</html>

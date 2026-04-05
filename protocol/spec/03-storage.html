@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 Storage — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="03-storage">03 Storage</h1>
+<p>This chapter defines persona storage, logical portability, encrypted-at-rest behavior, and optional encrypted-vault portability.</p>
+<h2 id="purpose">Purpose</h2>
+<p>Encrypted Storage defines how personal data is protected and made portable across implementations.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible storage system MUST provide:</p>
+<ul>
+<li>per-persona isolation</li>
+<li>encryption at rest</li>
+<li>typed vault records</li>
+<li>provenance and trust fields</li>
+<li>staging / pending approval support</li>
+<li>import/export at the logical schema level</li>
+</ul>
+<h2 id="persona-model">Persona Model</h2>
+<p>The protocol persona tiers are:</p>
+<ul>
+<li><code>default</code></li>
+<li><code>standard</code></li>
+<li><code>sensitive</code></li>
+<li><code>locked</code></li>
+</ul>
+<p>These tiers are already present in the reference implementation.</p>
+<p>Expected semantics:</p>
+<ul>
+<li><code>default</code>: always open, minimal friction</li>
+<li><code>standard</code>: open by policy, agent access requires scoped grants</li>
+<li><code>sensitive</code>: closed by default, requires approval</li>
+<li><code>locked</code>: passphrase or explicit unlock, agent access denied or highly restricted</li>
+</ul>
+<h2 id="physical-storage-profile">Physical Storage Profile</h2>
+<p>A Dina-compatible Home Node SHOULD use an encrypted SQL store per persona.</p>
+<p>The reference implementation uses SQLCipher-backed SQLite databases, one per persona, with encrypted-at-rest FTS and embedding storage.</p>
+<h2 id="logical-vault-schema">Logical Vault Schema</h2>
+<p>A Dina-compatible vault item model MUST be able to express:</p>
+<ul>
+<li>stable ID</li>
+<li>item type</li>
+<li>content</li>
+<li>metadata</li>
+<li>tags</li>
+<li>timestamps</li>
+<li>source and provenance</li>
+<li>trust and confidence</li>
+<li>retrieval policy</li>
+<li>optional embeddings</li>
+<li>optional redacted or tiered content views</li>
+</ul>
+<p>The reference implementation's persona schema currently includes logical fields such as:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>type</code></li>
+<li><code>source</code></li>
+<li><code>source_id</code></li>
+<li><code>contact_did</code></li>
+<li><code>summary</code></li>
+<li><code>body</code></li>
+<li><code>metadata</code></li>
+<li><code>tags</code></li>
+<li><code>timestamp</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+<li><code>sender</code></li>
+<li><code>sender_trust</code></li>
+<li><code>source_type</code></li>
+<li><code>confidence</code></li>
+<li><code>retrieval_policy</code></li>
+<li><code>content_l0</code></li>
+<li><code>content_l1</code></li>
+</ul>
+<p>The protocol SHOULD freeze the logical schema, not the exact SQL DDL.</p>
+<h2 id="search-and-semantic-hydration">Search and Semantic Hydration</h2>
+<p>The protocol SHOULD support:</p>
+<ul>
+<li>lexical search</li>
+<li>semantic retrieval</li>
+<li>staging before persistence</li>
+</ul>
+<p>The reference implementation currently provides:</p>
+<ul>
+<li>FTS5 over summary, body, tags, and contact surfaces</li>
+<li>HNSW vector search loaded only while a persona is unlocked</li>
+</ul>
+<p>Important storage rule:</p>
+<ul>
+<li>embeddings MUST be encrypted at rest</li>
+<li>in-memory vector indices MUST be destroyed on persona lock</li>
+</ul>
+<h2 id="backup-and-export">Backup and Export</h2>
+<p>Base Dina storage interoperability is logical, not file-format-level.</p>
+<p>At minimum, conforming implementations MUST support:</p>
+<ul>
+<li>logical export of vault contents, metadata, provenance, and trust fields</li>
+<li>logical import of that same material into another Dina-compatible implementation</li>
+<li>explicit user intent for any decrypted export</li>
+<li>clear marking of insecure or plaintext exports</li>
+</ul>
+<p>Implementations MUST NOT create silent plaintext backups as a side effect of normal backup or migration.</p>
+<p>Safe profiles therefore separate:</p>
+<ul>
+<li>logical portability: required for protocol interoperability</li>
+<li>encrypted vault portability: optional profile, if implementations want direct encrypted file interchange or seed-based vault recovery</li>
+</ul>
+<h2 id="encrypted-vault-portability-profile">Encrypted Vault Portability Profile</h2>
+<p>The current implementation has more than one active DEK derivation style:</p>
+<ul>
+<li>an HKDF profile of the form <code>dina:vault:&lt;persona&gt;:v1</code> with a user salt</li>
+<li>a versioned persona profile of the form <code>dina:persona:&lt;name&gt;:dek:vN</code> with deterministic persona-scoped salt</li>
+</ul>
+<p>This matters only if the protocol wants to guarantee one of the following:</p>
+<ul>
+<li>opening an encrypted vault file across implementations</li>
+<li>seed-based recovery of encrypted vault material without logical export</li>
+<li>encrypted backup portability without re-encryption</li>
+</ul>
+<p>Those guarantees are useful, but they are not required for base Dina interoperability.</p>
+<p>Therefore Protocol 1.0 MAY defer canonical DEK derivation at the core layer, provided it freezes:</p>
+<ul>
+<li>the logical vault schema</li>
+<li>the logical export/import contract</li>
+<li>explicit metadata describing any encrypted-vault portability profile</li>
+</ul>
+<p>If an encrypted vault portability profile is later standardized, it SHOULD define:</p>
+<ul>
+<li>the canonical DEK derivation profile</li>
+<li>DEK version metadata</li>
+<li>migration and re-encryption rules</li>
+<li>profile negotiation or profile declaration during import/export</li>
+</ul>
+</body>
+</html>

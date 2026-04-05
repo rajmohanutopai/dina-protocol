@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 Authentication — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="02-authentication">02 Authentication</h1>
+<p>This chapter defines request signing, pairing, service keys, and caller identity for Dina-compatible authentication.</p>
+<h2 id="purpose">Purpose</h2>
+<p>Authentication defines how a participant proves who it is.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible authentication profile MUST support signed requests using Ed25519.</p>
+<p>The canonical signing payload is:</p>
+<div class="codehilite"><pre><span></span><code>METHOD
+PATH
+QUERY
+TIMESTAMP
+NONCE
+SHA256_HEX(BODY)
+</code></pre></div>
+
+<p>The current reference implementation signs exactly this payload.</p>
+<p>A draft normalized schema for signed-request interoperability lives in:</p>
+<ul>
+<li><code>schemas/auth-envelope.json</code></li>
+</ul>
+<h2 id="http-header-contract">HTTP Header Contract</h2>
+<p>A signed HTTP request SHOULD carry:</p>
+<ul>
+<li><code>X-DID</code></li>
+<li><code>X-Timestamp</code></li>
+<li><code>X-Nonce</code></li>
+<li><code>X-Signature</code></li>
+</ul>
+<p><code>X-Signature</code> is the Ed25519 signature over the canonical payload.</p>
+<h2 id="replay-protection">Replay Protection</h2>
+<p>A conforming implementation MUST protect against replay.</p>
+<p>The reference implementation currently enforces:</p>
+<ul>
+<li>a 5-minute clock skew window</li>
+<li>a per-request nonce</li>
+<li>a double-buffer nonce cache for O(1) rotation and replay rejection</li>
+</ul>
+<h2 id="device-pairing">Device Pairing</h2>
+<p>A Dina-compatible Home Node SHOULD support device pairing as a bootstrap flow.</p>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>a 6-digit pairing code</li>
+<li>5-minute TTL</li>
+<li>single-use semantics</li>
+<li>a cryptographic secret behind the visible code</li>
+</ul>
+<p>Pairing MAY result in either:</p>
+<ul>
+<li>a registered Ed25519 device key</li>
+<li>a paired bearer token for compatibility or bootstrap flows</li>
+</ul>
+<h2 id="service-keys">Service Keys</h2>
+<p>Internal or peer services MAY authenticate with distinct service Ed25519 keypairs.</p>
+<p>This is already present in the reference implementation for Core-to-Brain and similar service paths.</p>
+<h2 id="auth-modes">Auth Modes</h2>
+<p>The Dina protocol recognizes at least these auth modes:</p>
+<ul>
+<li>device_signature</li>
+<li>service_signature</li>
+<li>paired_token</li>
+<li>browser_session</li>
+</ul>
+<p>The protocol SHOULD treat signature-based authentication as the primary interoperable profile.</p>
+<p>Paired bearer tokens are acceptable as a bootstrap or compatibility profile, but SHOULD NOT be the normative long-term cross-implementation trust model.</p>
+<h2 id="caller-model">Caller Model</h2>
+<p>A Dina-compatible implementation SHOULD propagate caller context containing at least:</p>
+<ul>
+<li>principal</li>
+<li>actor</li>
+<li>origin</li>
+<li>auth_mode</li>
+</ul>
+<p>This becomes important for:</p>
+<ul>
+<li>vault access policy</li>
+<li>approvals</li>
+<li>audit</li>
+<li>D2D relaying</li>
+<li>executor mediation</li>
+</ul>
+</body>
+</html>

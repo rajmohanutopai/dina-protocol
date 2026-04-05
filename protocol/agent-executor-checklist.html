@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Executor Conformance Checklist — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="agent-executor-conformance-checklist">Agent Executor Conformance Checklist</h1>
+<p>Status: draft</p>
+<p>Use this checklist when evaluating whether an implementation can claim the <code>agent-executor</code> Dina protocol profile.</p>
+<h2 id="1-identity-and-auth">1. Identity and Auth</h2>
+<ul>
+<li>[ ] Executor has a stable authenticated principal, typically a DID.</li>
+<li>[ ] Executor signs requests using Dina-compatible auth.</li>
+<li>[ ] Executor handles nonce/timestamp/replay rules correctly.</li>
+<li>[ ] Executor propagates caller context: principal, actor, origin, auth mode.</li>
+</ul>
+<h2 id="2-capability-advertisement">2. Capability Advertisement</h2>
+<ul>
+<li>[ ] Executor advertises the <code>agent-executor</code> profile.</li>
+<li>[ ] Executor declares supported semantic operations.</li>
+<li>[ ] Executor declares supported response-envelope versions and kinds.</li>
+<li>[ ] Executor declares unsupported optional features honestly.</li>
+<li>[ ] Executor advertises limits such as payload and timeout bounds.</li>
+</ul>
+<h2 id="3-intent-contract">3. Intent Contract</h2>
+<ul>
+<li>[ ] Executor emits a portable agent-intent declaration before sensitive access or action.</li>
+<li>[ ] Intent includes <code>agent_did</code>.</li>
+<li>[ ] Intent includes <code>action</code>.</li>
+<li>[ ] Intent includes <code>target</code>.</li>
+<li>[ ] Intent includes persona scope.</li>
+<li>[ ] Intent includes trust/sensitivity or equivalent policy context.</li>
+<li>[ ] Intent includes constraints.</li>
+</ul>
+<h2 id="4-session-and-grant-boundaries">4. Session and Grant Boundaries</h2>
+<ul>
+<li>[ ] Executor only operates within an active session.</li>
+<li>[ ] Executor respects scoped grants.</li>
+<li>[ ] Missing or expired grants block the action.</li>
+<li>[ ] Executor does not widen granted scope on its own.</li>
+</ul>
+<h2 id="5-approval-handling">5. Approval Handling</h2>
+<ul>
+<li>[ ] Approval-required actions are surfaced for approval.</li>
+<li>[ ] Executor does not bypass approval through alternate code paths.</li>
+<li>[ ] Denied approvals block the action cleanly.</li>
+<li>[ ] Approval state is auditable.</li>
+</ul>
+<h2 id="6-egress-and-safety">6. Egress and Safety</h2>
+<ul>
+<li>[ ] Executor respects PII scrubbing requirements.</li>
+<li>[ ] Executor does not send sensitive data outside allowed channels.</li>
+<li>[ ] Executor follows Home Node policy decisions.</li>
+<li>[ ] Executor handles policy denials as protocol outcomes, not silent fallthrough.</li>
+</ul>
+<h2 id="7-result-contract">7. Result Contract</h2>
+<ul>
+<li>[ ] Executor returns results using the portable response envelope.</li>
+<li>[ ] Success, partial, and failure states are explicit.</li>
+<li>[ ] Provenance or disclosure annotations are included when relevant.</li>
+<li>[ ] Unknown optional response extensions do not break the executor.</li>
+</ul>
+<h2 id="8-operational-honesty">8. Operational Honesty</h2>
+<ul>
+<li>[ ] Executor does not claim Home Node authority.</li>
+<li>[ ] Executor does not claim trust publication/query support unless implemented.</li>
+<li>[ ] Executor does not claim native D2D support unless implemented.</li>
+<li>[ ] Executor does not claim storage portability support unless implemented.</li>
+</ul>
+<h2 id="9-interoperability-checks">9. Interoperability Checks</h2>
+<ul>
+<li>[ ] Capability advertisement validates against the protocol schema.</li>
+<li>[ ] Agent-intent payload validates against the protocol schema.</li>
+<li>[ ] Response envelopes validate against the protocol schema.</li>
+<li>[ ] Negotiation falls back to common subset when optional capabilities differ.</li>
+</ul>
+<h2 id="10-minimum-pass-condition">10. Minimum Pass Condition</h2>
+<p>An executor should not claim <code>agent-executor</code> conformance unless all critical items above pass:<br />
+- identity/auth<br />
+- intent contract<br />
+- session/grant boundaries<br />
+- approval handling<br />
+- result contract<br />
+- operational honesty</p>
+<p>This checklist operationalizes the protocol sections and the agent-specific rows in <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html">test-matrix.md</a>.</p>
+</body>
+</html>

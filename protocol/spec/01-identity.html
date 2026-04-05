@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01 Identity — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="01-identity">01 Identity</h1>
+<p>This chapter defines sovereign identity, derivation, DID representation, and recovery for Dina-compatible implementations.</p>
+<h2 id="purpose">Purpose</h2>
+<p>Identity defines who a sovereign participant is and how other implementations recognize that participant.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible identity system MUST define:</p>
+<ul>
+<li>a recoverable root secret</li>
+<li>deterministic key derivation rules</li>
+<li>a DID representation</li>
+<li>a DID document or equivalent resolution record</li>
+<li>a key rotation model</li>
+<li>service endpoint discovery</li>
+</ul>
+<h2 id="root-secret-model">Root Secret Model</h2>
+<p>The intended Dina identity model is:</p>
+<ul>
+<li>generate a BIP-39 mnemonic</li>
+<li>derive root key material from that mnemonic</li>
+<li>derive protocol-specific subkeys under a Dina-specific purpose path</li>
+</ul>
+<p>The Dina-specific HD namespace is:</p>
+<ul>
+<li><code>m/9999'/0'/...</code> root identity signing</li>
+<li><code>m/9999'/1'/...</code> persona and sub-identity signing</li>
+<li><code>m/9999'/2'/...</code> PLC recovery / rotation</li>
+<li><code>m/9999'/3'/...</code> service-to-service authentication</li>
+</ul>
+<p>This prevents collision with wallet ecosystems such as BIP-44.</p>
+<h2 id="current-reference-implementation">Current Reference Implementation</h2>
+<p>The current Dina reference implementation already uses:</p>
+<ul>
+<li>BIP-39 recovery phrases on the CLI side</li>
+<li>SLIP-0010 hardened derivation under <code>m/9999'/...</code></li>
+<li>Ed25519 for identity and service signing</li>
+<li>secp256k1 for PLC recovery / rotation keys</li>
+</ul>
+<p>Concrete derivation paths in the current implementation include:</p>
+<ul>
+<li><code>m/9999'/0'/0'</code> root signing generation 0</li>
+<li><code>m/9999'/0'/&lt;generation&gt;'</code> subsequent root signing generations</li>
+<li><code>m/9999'/1'/&lt;personaIndex&gt;'/&lt;generation&gt;'</code> persona signing</li>
+<li><code>m/9999'/2'/&lt;generation&gt;'</code> PLC recovery / rotation</li>
+<li><code>m/9999'/3'/&lt;serviceIndex&gt;'</code> service authentication</li>
+</ul>
+<h2 id="did-methods">DID Methods</h2>
+<p>A Dina-compatible Home Node SHOULD expose a <code>did:plc</code> identity.</p>
+<p>Device and service principals MAY use:</p>
+<ul>
+<li><code>did:key</code></li>
+<li><code>did:plc</code></li>
+<li><code>did:web</code></li>
+</ul>
+<p>The current reference implementation accepts all three DID prefixes at the domain layer, while using <code>did:plc</code> as the primary Home Node identity and <code>did:key</code> for CLI device identities.</p>
+<h2 id="did-document-requirements">DID Document Requirements</h2>
+<p>A Dina-compatible DID document SHOULD expose:</p>
+<ul>
+<li>one or more Ed25519 verification methods in multikey format</li>
+<li>authentication references</li>
+<li>service endpoints for Dina messaging and other declared capabilities</li>
+</ul>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>Ed25519 multikeys with the <code>0xed01</code> multicodec prefix</li>
+<li>a Dina messaging service endpoint, typically <code>DinaMsgBox</code></li>
+</ul>
+<h2 id="rotation-and-recovery">Rotation and Recovery</h2>
+<p>Home Node identities MUST support key rotation.</p>
+<p>For <code>did:plc</code>, rotation SHOULD be driven through a recovery key distinct from the root signing key.</p>
+<p>The current reference implementation derives PLC recovery keys from the dedicated <code>m/9999'/2'/...</code> subtree and supports PDS/PLC-backed DID lifecycle operations.</p>
+<h2 id="protocol-freeze-point">Protocol Freeze Point</h2>
+<p>The reference implementation currently has an unresolved identity-root question:</p>
+<ul>
+<li>some code paths treat the root as raw 32-byte entropy rendered as a BIP-39 mnemonic</li>
+<li>some documentation and tests treat the root as the 64-byte BIP-39 PBKDF2-expanded seed</li>
+</ul>
+<p>Before Dina Protocol 1.0 is frozen, the protocol MUST standardize one root key material profile for downstream derivation.</p>
+<p>Recommended direction:</p>
+<ul>
+<li>recovery secret: 24-word BIP-39 mnemonic</li>
+<li>canonical root key material: BIP-39 PBKDF2-expanded seed</li>
+<li>deterministic subkey derivation from that canonical root key material</li>
+</ul>
+</body>
+</html>

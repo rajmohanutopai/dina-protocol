@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07 Interaction — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="07-interaction">07 Interaction</h1>
+<p>This chapter defines semantic operations, outbound delivery, execution decomposition, context resolution, and response contracts.</p>
+<h2 id="purpose">Purpose</h2>
+<p>This is the missing interoperability layer most systems ignore.</p>
+<p>Without it, two implementations may share identity, auth, D2D, and trust but still fail to behave similarly from the user's point of view.</p>
+<p>The Interaction Contract layer standardizes:</p>
+<ul>
+<li>what a user-level operation means</li>
+<li>what a proactive Dina-to-human delivery means</li>
+<li>what result shape is expected</li>
+<li>how one external interaction may decompose internally</li>
+<li>how requests are grounded into structured context</li>
+</ul>
+<h2 id="semantic-operation-registry">Semantic Operation Registry</h2>
+<p>The protocol SHOULD standardize semantic operation types, not command spellings.</p>
+<p>The registry itself is already part of the protocol design. The remaining 1.0 work is to freeze:</p>
+<ul>
+<li>the mandatory core subset</li>
+<li>extension rules for vendor- or profile-specific operations</li>
+<li>machine-readable schema for operation declaration and validation</li>
+</ul>
+<p>Implementations SHOULD advertise their supported semantic operations through the capability discovery layer rather than forcing remote peers to infer them from product-specific UI or command names.</p>
+<p>Recommended primary semantic operations are:</p>
+<ul>
+<li><code>remember_context</code></li>
+<li><code>answer_now</code></li>
+<li><code>propose_plan</code></li>
+<li><code>communicate_person</code></li>
+<li><code>request_service</code></li>
+<li><code>delegate_task</code></li>
+<li><code>watch_condition</code></li>
+</ul>
+<p>Control operations:</p>
+<ul>
+<li><code>approve_operation</code></li>
+<li><code>inspect_status</code></li>
+<li><code>modify_existing</code></li>
+<li><code>cancel_operation</code></li>
+<li><code>recover_operation</code></li>
+</ul>
+<p>Resource operations:</p>
+<ul>
+<li><code>manage_contact</code></li>
+<li><code>manage_config</code></li>
+<li><code>manage_device</code></li>
+<li><code>manage_session</code></li>
+<li><code>inspect_audit</code></li>
+</ul>
+<p>Trust operations:</p>
+<ul>
+<li><code>query_trust</code></li>
+<li><code>publish_review</code></li>
+<li><code>publish_vouch</code></li>
+<li><code>publish_flag</code></li>
+</ul>
+<p>Outbound delivery operations:</p>
+<ul>
+<li><code>deliver_briefing</code></li>
+<li><code>deliver_alert</code></li>
+<li><code>deliver_update</code></li>
+<li><code>deliver_completion</code></li>
+<li><code>deliver_failure</code></li>
+<li><code>request_clarification</code></li>
+<li><code>escalate_attention</code></li>
+</ul>
+<p>These are protocol semantics, not command names.</p>
+<p>One implementation might expose:</p>
+<ul>
+<li><code>/ask</code></li>
+<li><code>/plan</code></li>
+<li><code>/send</code></li>
+<li><code>/request</code></li>
+</ul>
+<p>Another might expose:</p>
+<ul>
+<li><code>/query</code></li>
+<li><code>/advise</code></li>
+<li><code>/message</code></li>
+<li><code>/service</code></li>
+</ul>
+<p>Another might expose no slash commands at all and use only buttons, forms, or plain language.</p>
+<p>All of them remain interoperable if they preserve the same semantic contracts.</p>
+<h2 id="outbound-delivery-semantics">Outbound Delivery Semantics</h2>
+<p>The interaction protocol is not only human -&gt; Dina.</p>
+<p>It must also standardize when Dina speaks to the human without a fresh inbound command.</p>
+<p>At minimum, a conforming implementation SHOULD support these proactive delivery semantics:</p>
+<ul>
+<li><code>deliver_briefing</code>: aggregated, priority-ranked summary</li>
+<li><code>deliver_alert</code>: immediate fiduciary or harm-preventing notice</li>
+<li><code>deliver_update</code>: non-terminal progress or state change</li>
+<li><code>deliver_completion</code>: solicited work reached a useful terminal point</li>
+<li><code>deliver_failure</code>: solicited work failed or became invalid</li>
+<li><code>request_clarification</code>: Dina cannot proceed safely without more input</li>
+<li><code>escalate_attention</code>: a previously lower-priority item now requires interruption</li>
+</ul>
+<p>These are semantic contracts, not UI prescriptions.</p>
+<p>One implementation may show a push notification.<br />
+Another may add a notification center item.<br />
+Another may surface the item only in a daily briefing.</p>
+<h2 id="reference-mapping">Reference Mapping</h2>
+<p>The current Dina reference product maps its external command surface approximately as follows:</p>
+<ul>
+<li><code>/remember</code> -&gt; <code>remember_context</code></li>
+<li><code>/ask</code> -&gt; <code>answer_now</code></li>
+<li><code>/plan</code> -&gt; <code>propose_plan</code></li>
+<li><code>/send</code> -&gt; <code>communicate_person</code></li>
+<li><code>/request</code> -&gt; <code>request_service</code></li>
+<li><code>/task</code> -&gt; <code>delegate_task</code></li>
+<li><code>/watch</code> -&gt; <code>watch_condition</code></li>
+<li><code>/approve</code> -&gt; <code>approve_operation</code></li>
+<li><code>/status</code> -&gt; <code>inspect_status</code></li>
+<li><code>/edit</code> -&gt; <code>modify_existing</code></li>
+<li><code>/cancel</code> -&gt; <code>cancel_operation</code></li>
+<li><code>/recover</code> -&gt; <code>recover_operation</code></li>
+</ul>
+<p>Resource examples:</p>
+<ul>
+<li><code>/contact ...</code> -&gt; <code>manage_contact</code></li>
+<li><code>/config ...</code> -&gt; <code>manage_config</code></li>
+<li><code>/device ...</code> -&gt; <code>manage_device</code></li>
+<li><code>/session ...</code> -&gt; <code>manage_session</code></li>
+<li><code>/audit ...</code> -&gt; <code>inspect_audit</code></li>
+</ul>
+<p>Trust examples:</p>
+<ul>
+<li><code>/trust</code> -&gt; <code>query_trust</code></li>
+<li><code>/review</code> -&gt; <code>publish_review</code></li>
+<li><code>/vouch</code> -&gt; <code>publish_vouch</code></li>
+<li><code>/flag</code> -&gt; <code>publish_flag</code></li>
+</ul>
+<p>This mapping is explicitly non-normative.</p>
+<h2 id="outer-contract-vs-execution-graph">Outer Contract vs Execution Graph</h2>
+<p>This is the key interaction rule:</p>
+<ul>
+<li>the external operation defines the outer contract</li>
+<li>the implementation is free to build the internal execution graph</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>an <code>answer_now</code> operation may internally decompose into <code>answer_now + request_service + propose_plan + context_resolution</code></li>
+<li>a <code>propose_plan</code> operation may internally decompose into <code>answer_now + compare + synthesize</code></li>
+<li>a <code>delegate_task</code> operation may internally decompose into <code>propose_plan + answer_now + request_service + watch_condition</code></li>
+<li>a <code>watch_condition</code> operation may internally decompose into <code>request_service + subscribe + status_tracking</code></li>
+</ul>
+<p>This rule is required to handle real scenarios such as:</p>
+<ul>
+<li>asking a remote transit Dina for a bus ETA</li>
+<li>planning a commute from live traffic and calendar data</li>
+<li>delegating long-running research to a remote executor</li>
+<li>monitoring a service or delivery and alerting later</li>
+</ul>
+<h2 id="multi-turn-interaction-frames">Multi-Turn Interaction Frames</h2>
+<p>The protocol SHOULD model interactions as frames, not isolated stateless turns.</p>
+<p>An interaction frame SHOULD carry at least:</p>
+<ul>
+<li>current outer contract</li>
+<li>resolved entities and context</li>
+<li>pending clarification</li>
+<li>proposed options or candidate actions</li>
+<li>any active approval or execution state</li>
+</ul>
+<p>Follow-up turns SHOULD remain within the existing outer contract unless the user clearly pivots.</p>
+<p>Examples:</p>
+<ul>
+<li>disambiguation remains inside the current contract</li>
+<li>correction remains inside the current contract</li>
+<li>selecting an option from a prior plan starts a new execution contract with the plan retained as provenance</li>
+</ul>
+<h2 id="counterparty-classes">Counterparty Classes</h2>
+<p>The interaction protocol SHOULD distinguish:</p>
+<ul>
+<li>person-oriented communication</li>
+<li>provider or institution request</li>
+<li>infrastructure request</li>
+<li>device request</li>
+<li>delegated executor request</li>
+</ul>
+<p>This distinction matters because:</p>
+<ul>
+<li><code>communicate_person</code> is different from <code>request_service</code></li>
+<li>a D2D social exchange is different from a provider action</li>
+<li>a remote Dina may be social, institutional, or infrastructural</li>
+</ul>
+<h2 id="persona-and-sensitivity-scope">Persona and Sensitivity Scope</h2>
+<p>The interaction protocol SHOULD treat persona scope as part of routing, not merely storage.</p>
+<p>At minimum, a conforming implementation SHOULD evaluate:</p>
+<ul>
+<li>target persona or personas</li>
+<li>persona tier</li>
+<li>interaction sensitivity</li>
+<li>whether the request crosses persona boundaries</li>
+<li>whether approval, grant, or explicit unlock is required</li>
+</ul>
+<p>This is necessary for interoperable governance because:</p>
+<ul>
+<li>remembering into health is not governed like remembering into general</li>
+<li>a finance request is not governed like a restaurant booking</li>
+<li>a plan spanning multiple personas may require explicit cross-persona consent</li>
+</ul>
+<h2 id="context-resolution">Context Resolution</h2>
+<p>Before fulfillment, a Dina-compatible implementation SHOULD resolve:</p>
+<ul>
+<li>subject context</li>
+<li>spatial context</li>
+<li>temporal context</li>
+<li>conversation context</li>
+<li>relationship context</li>
+<li>policy context</li>
+<li>confidence</li>
+</ul>
+<p>This is what allows phrases like:</p>
+<ul>
+<li>"this bus"</li>
+<li>"here"</li>
+<li>"them"</li>
+<li>"my usual route"</li>
+</ul>
+<p>to become structured interoperable requests.</p>
+<h2 id="delivery-and-notification-contract">Delivery and Notification Contract</h2>
+<p>The interaction protocol SHOULD also standardize how work completion and failure are surfaced back to the human.</p>
+<p>At minimum, implementations should distinguish:</p>
+<ul>
+<li>inline response</li>
+<li>queued completion notice</li>
+<li>proactive failure notice</li>
+<li>briefing inclusion</li>
+<li>escalation due to harm if ignored</li>
+</ul>
+<p>This is the outbound half of Silence First.</p>
+<h2 id="response-contract">Response Contract</h2>
+<p>The response layer SHOULD support a portable envelope with a small, typed set of response kinds:</p>
+<ul>
+<li><code>summary</code></li>
+<li><code>list</code></li>
+<li><code>table</code></li>
+<li><code>comparison</code></li>
+<li><code>status</code></li>
+<li><code>error</code></li>
+<li><code>raw</code></li>
+</ul>
+<p>This is not just UI polish. It is part of protocol interoperability because agents, Dinas, bridges, and clients need a stable result contract.</p>
+<p>At minimum, the response envelope SHOULD freeze these core fields:</p>
+<ul>
+<li><code>schema_version</code></li>
+<li><code>type</code></li>
+<li><code>title</code></li>
+<li><code>text</code></li>
+<li><code>data</code></li>
+<li><code>meta</code></li>
+</ul>
+<p>The response layer SHOULD also remain explicitly extensible. A conforming envelope MAY include:</p>
+<ul>
+<li><code>annotations</code></li>
+<li><code>disclosures</code></li>
+<li><code>extensions</code></li>
+</ul>
+<p>This is important because different Dina-compatible ecosystems may allow different downstream behaviors while still remaining interoperable.</p>
+<p>Examples:</p>
+<ul>
+<li>provenance annotations</li>
+<li>trust or confidence annotations</li>
+<li>sponsorship or commercial disclosures</li>
+<li>implementation-specific rendering hints</li>
+</ul>
+<p>The protocol should require that such additions be explicit and machine-readable rather than hidden inside arbitrary text.</p>
+<p>A draft machine-readable schema for this contract lives in:</p>
+<ul>
+<li><code>schemas/response-envelope.json</code></li>
+</ul>
+<p>Implementations SHOULD advertise supported response kinds, envelope versions, and extension namespaces through the capability discovery layer.</p>
+<h2 id="bridges-vs-native-d2d">Bridges vs Native D2D</h2>
+<p>Email, chat apps, and provider APIs remain important, but they are not the same thing as Dina-to-Dina communication.</p>
+<p>The interaction protocol therefore distinguishes:</p>
+<ul>
+<li>native D2D coordination</li>
+<li>provider / infrastructure requests</li>
+<li>bridge delivery over email or chat</li>
+</ul>
+<p>This preserves the qualitative difference between:</p>
+<ul>
+<li>person-to-person sovereign coordination</li>
+<li>formal correspondence</li>
+<li>service requests</li>
+</ul>
+<p>without requiring every implementation to expose those differences through the same UI.</p>
+</body>
+</html>

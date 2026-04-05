@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 D2D — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="05-d2d">05 D2D</h1>
+<p>This chapter defines Dina-to-Dina transport, message families, policy, offline delivery, and federated execution.</p>
+<h2 id="purpose">Purpose</h2>
+<p>D2D defines how two sovereign identities coordinate securely.</p>
+<p>It is not just a transport channel. It is a policy-aware, trust-aware coordination layer between two human-centered systems.</p>
+<h2 id="protocol-requirements">Protocol Requirements</h2>
+<p>A Dina-compatible D2D layer MUST provide:</p>
+<ul>
+<li>DID resolution for endpoint discovery</li>
+<li>sender authentication</li>
+<li>message confidentiality</li>
+<li>typed message families</li>
+<li>replay protection</li>
+<li>outbox / offline delivery semantics</li>
+<li>contact and sharing policy enforcement</li>
+</ul>
+<h2 id="wire-model">Wire Model</h2>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>Ed25519 signatures over plaintext messages</li>
+<li>Ed25519-to-X25519 conversion for encryption</li>
+<li>NaCl sealed box encryption</li>
+<li>a JSON wrapper containing ciphertext and signature</li>
+</ul>
+<p>The current transport wrapper is effectively:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;base64 ciphertext&gt;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;s&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;hex ed25519 signature over plaintext&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The plaintext message model is currently:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;msg-123&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;coordination.request&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:plc:sender&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;did:plc:recipient&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;created_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1710000000</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2 id="message-families">Message Families</h2>
+<p>The current Dina D2D v1 families are:</p>
+<ul>
+<li><code>presence.signal</code></li>
+<li><code>coordination.request</code></li>
+<li><code>coordination.response</code></li>
+<li><code>social.update</code></li>
+<li><code>safety.alert</code></li>
+<li><code>trust.vouch.request</code></li>
+<li><code>trust.vouch.response</code></li>
+</ul>
+<p>These are the transport-level v1 families the current implementation accepts as its strict D2D surface.</p>
+<h2 id="message-policy">Message Policy</h2>
+<p>The current scenario policy model is:</p>
+<ul>
+<li><code>standing_policy</code></li>
+<li><code>explicit_once</code></li>
+<li><code>deny_by_default</code></li>
+</ul>
+<p>Default scenario families in the reference implementation currently map roughly to:</p>
+<ul>
+<li>presence: standing</li>
+<li>coordination: standing</li>
+<li>social: standing</li>
+<li>safety: standing</li>
+<li>trust: explicit_once</li>
+</ul>
+<p><code>safety.alert</code> is treated as a special always-pass inbound case.</p>
+<h2 id="contact-and-sharing-policy">Contact and Sharing Policy</h2>
+<p>D2D interoperability requires more than cryptography.</p>
+<p>It also requires:</p>
+<ul>
+<li>explicit contact state</li>
+<li>trust ring</li>
+<li>entity resolution mode</li>
+<li>per-category sharing policy</li>
+</ul>
+<p>The reference implementation already models:</p>
+<ul>
+<li>trust rings</li>
+<li>resolution modes such as late binding vs plaintext</li>
+<li>per-category sharing tiers</li>
+</ul>
+<p>This is critical for person-to-person interoperability because "can I reach this Dina" and "what may I disclose to this Dina" are different questions.</p>
+<h2 id="outbox-and-offline-delivery">Outbox and Offline Delivery</h2>
+<p>A conforming implementation SHOULD support durable offline delivery.</p>
+<p>The reference implementation already has:</p>
+<ul>
+<li>durable outbox records</li>
+<li>retries with exponential backoff</li>
+<li>pending approval state</li>
+<li>delivered vs failed state</li>
+<li>support for a Dina message box endpoint</li>
+</ul>
+<p>Outbox states currently include:</p>
+<ul>
+<li><code>pending</code></li>
+<li><code>pending_approval</code></li>
+<li><code>sending</code></li>
+<li><code>delivered</code></li>
+<li><code>failed</code></li>
+</ul>
+<h2 id="replay-and-verification">Replay and Verification</h2>
+<p>A D2D implementation MUST reject replayed messages.</p>
+<p>The reference implementation uses <code>senderDID|messageID</code> replay tracking and verifies inbound signatures against resolved verification methods.</p>
+<h2 id="federated-execution">Federated Execution</h2>
+<p>This is where interaction learnings materially expand the protocol.</p>
+<p>A remote Dina is not just a mailbox. It may act as an orchestrator.</p>
+<p>Therefore the protocol MUST allow the following D2D fulfillment patterns:</p>
+<ul>
+<li>direct response</li>
+<li>remote query</li>
+<li>remote delegated execution</li>
+<li>remote monitoring or subscription</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>your Dina asks a transit operator Dina for a bus ETA</li>
+<li>the transit Dina may query its own database, call traffic systems, or invoke its own task executor</li>
+<li>your Dina receives a protocol-level outcome, not the transit Dina's internal implementation details</li>
+</ul>
+<p>For this reason, D2D interop SHOULD standardize a generic request-state plane.</p>
+<p>Recommended request modes are:</p>
+<ul>
+<li><code>inline_preferred</code></li>
+<li><code>async</code></li>
+<li><code>subscription</code></li>
+</ul>
+<p>Recommended lifecycle states are:</p>
+<ul>
+<li><code>accepted</code></li>
+<li><code>waiting_approval</code></li>
+<li><code>waiting_input</code></li>
+<li><code>running</code></li>
+<li><code>partial</code></li>
+<li><code>completed</code></li>
+<li><code>failed</code></li>
+<li><code>cancelled</code></li>
+<li><code>expired</code></li>
+</ul>
+<p>Required fields in a generic D2D request-state object SHOULD include:</p>
+<ul>
+<li><code>request_id</code></li>
+<li><code>correlation_id</code></li>
+<li><code>requested_capability</code></li>
+<li><code>response_mode</code></li>
+<li><code>status</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<p>Optional fields SHOULD include:</p>
+<ul>
+<li><code>result</code></li>
+<li><code>error</code></li>
+<li><code>retryable</code></li>
+<li><code>progress</code></li>
+<li><code>percent</code></li>
+<li><code>eta</code></li>
+<li><code>expires_at</code></li>
+<li><code>provenance</code></li>
+<li><code>requires_human</code></li>
+<li><code>next_action</code></li>
+</ul>
+<p>Support for request modes, lifecycle states, and optional fields SHOULD be advertised through the capability discovery layer so that remote peers know the highest common lifecycle they can use.</p>
+<p>The current v1 transport families do not yet fully freeze this generic request-state plane. That is an open standardization task before Protocol 1.0.</p>
+<p>Draft machine-readable artifacts for D2D interop live in:</p>
+<ul>
+<li><code>schemas/d2d-envelope.json</code></li>
+<li><code>schemas/capability-advertisement.json</code></li>
+<li><code>schemas/capability-negotiation.json</code></li>
+</ul>
+</body>
+</html>

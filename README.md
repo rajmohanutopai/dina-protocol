@@ -91,12 +91,12 @@ protocol/
 
 ## Reading Order
 
-1. Start with [00-overview.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.md) for scope, design goals, and protocol shape.
-2. Read chapters [01](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.md) through [07](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.md) for the full protocol specification.
-3. Read [08-profiles-and-scenarios.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.md) to understand conformance targets.
-4. Read [09-security-and-stability.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.md) for security guarantees and remaining freeze points.
+1. Start with [00-overview.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/00-overview.html) for scope, design goals, and protocol shape.
+2. Read chapters [01](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/01-identity.html) through [07](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/07-interaction.html) for the full protocol specification.
+3. Read [08-profiles-and-scenarios.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/08-profiles-and-scenarios.html) to understand conformance targets.
+4. Read [09-security-and-stability.md](https://rajmohanutopai.github.io/dina-protocol/protocol/spec/09-security-and-stability.html) for security guarantees and remaining freeze points.
 5. Use the [schemas](https://rajmohanutopai.github.io/dina-protocol/protocol/schemas/) and [examples](https://rajmohanutopai.github.io/dina-protocol/protocol/examples/) to build validators and interop tests.
-6. Use the [test matrix](https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.md) to verify conformance.
+6. Use the [test matrix](https://rajmohanutopai.github.io/dina-protocol/protocol/test-matrix.html) to verify conformance.
 
 ---
 

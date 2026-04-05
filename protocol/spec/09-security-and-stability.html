@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09 Security And Stability — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="09-security-and-stability">09 Security And Stability</h1>
+<p>This chapter defines protocol-level guarantees, remaining freeze points, and current reference implementation status.</p>
+<h2 id="security-properties">Security Properties</h2>
+<p>At protocol level, Dina aims to guarantee:</p>
+<ul>
+<li>sovereign identity under user-controlled root material</li>
+<li>request authenticity via Ed25519</li>
+<li>replay protection</li>
+<li>encryption at rest per persona</li>
+<li>explicit safety mediation for risky agent access</li>
+<li>strong D2D confidentiality and authenticity</li>
+<li>attributable public trust publication</li>
+<li>portable interaction semantics above transport</li>
+</ul>
+<h2 id="open-standardization-questions">Open Standardization Questions</h2>
+<h3 id="core-freeze-points">Core Freeze Points</h3>
+<p>These should be resolved before calling the core protocol frozen:</p>
+<ol>
+<li>Root key material profile</li>
+<li>raw mnemonic entropy vs PBKDF2-expanded BIP-39 seed</li>
+<li>
+<p>recommended 1.0 choice: 24-word BIP-39 mnemonic as recovery secret,<br />
+     PBKDF2-expanded BIP-39 seed as canonical root key material,<br />
+     with SLIP-0010 downstream derivation from that seed</p>
+</li>
+<li>
+<p>D2D generic request-state plane</p>
+</li>
+<li>freeze request modes, lifecycle states, and required fields for federated execution</li>
+<li>
+<p>recommended 1.0 choice: request modes <code>inline_preferred</code>, <code>async</code>, <code>subscription</code>;<br />
+     lifecycle states <code>accepted</code>, <code>waiting_approval</code>, <code>waiting_input</code>, <code>running</code>,<br />
+<code>partial</code>, <code>completed</code>, <code>failed</code>, <code>cancelled</code>, <code>expired</code>;<br />
+     required fields <code>request_id</code>, <code>correlation_id</code>, <code>requested_capability</code>,<br />
+<code>response_mode</code>, <code>status</code>, <code>created_at</code>, <code>updated_at</code></p>
+</li>
+<li>
+<p>Trust core collection subset</p>
+</li>
+<li>define the 1.0 mandatory namespace subset</li>
+<li>
+<p>recommended 1.0 choice: <code>com.dina.trust.attestation</code>,<br />
+<code>com.dina.trust.vouch</code>, <code>com.dina.trust.flag</code>,<br />
+<code>com.dina.trust.revocation</code>, <code>com.dina.trust.verification</code></p>
+</li>
+<li>
+<p>Capability discovery and negotiation</p>
+</li>
+<li>freeze the capability advertisement contract, profile identifiers,<br />
+     extension namespace rules, and live negotiation semantics</li>
+<li>
+<p>recommended 1.0 choice: static capability advertisement plus live negotiation,<br />
+     with profile identifiers at least for <code>home-node</code>, <code>device</code>, <code>agent-executor</code>,<br />
+<code>provider-dina</code>, <code>trust-appview</code>, <code>bridge</code>, and <code>mobile-home-node</code></p>
+</li>
+<li>
+<p>Interaction operation registry</p>
+</li>
+<li>freeze the required core semantic operation set and extension rules</li>
+<li>
+<p>recommended 1.0 choice: freeze semantic names and contracts for<br />
+<code>remember_context</code>, <code>answer_now</code>, <code>propose_plan</code>, <code>communicate_person</code>,<br />
+<code>request_service</code>, <code>delegate_task</code>, <code>watch_condition</code>, <code>approve_operation</code>,<br />
+<code>inspect_status</code>, <code>modify_existing</code>, <code>cancel_operation</code>, <code>recover_operation</code>,<br />
+<code>deliver_briefing</code>, <code>deliver_alert</code>, <code>deliver_update</code>, <code>deliver_completion</code>,<br />
+<code>deliver_failure</code>, <code>request_clarification</code>, <code>escalate_attention</code></p>
+</li>
+<li>
+<p>Response envelope schema</p>
+</li>
+<li>freeze the portable typed response envelope and its extensibility model</li>
+<li>recommended 1.0 choice: response kinds <code>summary</code>, <code>list</code>, <code>table</code>,<br />
+<code>comparison</code>, <code>status</code>, <code>error</code>, <code>raw</code>; required envelope fields<br />
+<code>schema_version</code>, <code>type</code>, <code>text</code>, <code>data</code>; optional standardized fields<br />
+<code>title</code>, <code>meta</code>, <code>annotations</code>, <code>disclosures</code>, <code>extensions</code></li>
+</ol>
+<h3 id="profile-and-portability-questions">Profile and Portability Questions</h3>
+<p>These affect optional profiles, not base protocol interoperability:</p>
+<ol>
+<li>Encrypted vault portability profile</li>
+<li>decide whether Protocol 1.0 will standardize canonical DEK derivation<br />
+     for encrypted vault interchange and seed-based encrypted recovery</li>
+<li>
+<p>otherwise keep logical export/import as the required storage portability contract</p>
+</li>
+<li>
+<p>Mobile storage profile</p>
+</li>
+<li>define minimum SQLCipher-equivalent encryption<br />
+     for iOS Keychain / Android Keystore integration</li>
+<li>define background/foreground lifecycle rules<br />
+     for DEK management on mobile</li>
+</ol>
+<h2 id="what-dina-as-protocol-means">What "Dina as Protocol" Means</h2>
+<p>When this protocol is implemented correctly:</p>
+<ul>
+<li>a Rust Home Node can interoperate with a Go Home Node</li>
+<li>a Swift device can sign requests against any Dina-compatible node</li>
+<li>a browser bridge can participate in interaction semantics without owning vault authority</li>
+<li>one implementation can discover another implementation's supported profiles and extensions before attempting optional interop</li>
+<li>one Dina can ask another Dina for an outcome, and the remote Dina can satisfy it through its own tools or executors</li>
+<li>any AppView that indexes <code>com.dina.trust.*</code> can serve trust for any Dina-compatible identity</li>
+<li>vaults, trust records, D2D messages, and interaction semantics stop being implementation-private details</li>
+</ul>
+<p>That is the transition from product to infrastructure.</p>
+<h2 id="reference-implementation-status">Reference Implementation Status</h2>
+<p>The current Dina codebase already provides substantial pieces of this protocol:</p>
+<ul>
+<li>SLIP-0010 <code>m/9999'</code> identity derivation</li>
+<li><code>did:plc</code> and <code>did:key</code> usage</li>
+<li>Ed25519 request signing</li>
+<li>pairing and device registration</li>
+<li>per-persona encrypted storage</li>
+<li>HNSW hydration on unlock and destruction on lock</li>
+<li>session-scoped grants and approvals</li>
+<li>PII scrubbing</li>
+<li>D2D signatures, encryption, outbox, and policy gates</li>
+<li>AT Protocol trust publishing and AppView query integration</li>
+<li>a much more precise interaction architecture than a simple "assistant command" model</li>
+</ul>
+<p>The protocol document is therefore not speculative. It is extracted from a real system, while also identifying the exact points where the system still needs one canonical choice before the protocol can be declared stable.</p>
+</body>
+</html>

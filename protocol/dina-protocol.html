@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dina Protocol — Dina Protocol</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #f8fafc;
+    --table-stripe: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --fg: #e2e8f0;
+      --accent: #60a5fa;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #1e293b;
+      --table-stripe: #1e293b;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { font-size: 2rem; margin: 2rem 0 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin: 2rem 0 0.75rem; color: var(--accent); }
+  h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+  h4 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  ul, ol { margin: 0.75rem 0; padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:nth-child(even) { background: var(--table-stripe); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--muted);
+    background: var(--code-bg);
+    border-radius: 0 8px 8px 0;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  img { max-width: 100%; height: auto; }
+  .nav { margin-bottom: 2rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+  .nav a { margin-right: 1rem; }
+  input[type="checkbox"] { margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Dina Protocol</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/index.html">Index</a>
+  <a href="https://rajmohanutopai.github.io/dina-protocol/protocol/index.html">Spec</a>
+  <a href="https://github.com/rajmohanutopai/dina-protocol">GitHub</a>
+</nav>
+<h1 id="dina-protocol">Dina Protocol</h1>
+<p>Status: draft, reference-implementation-driven</p>
+<p>This document defines Dina as a protocol rather than a single product implementation.</p>
+<p>The goal is:</p>
+<ul>
+<li>any implementation can create a Dina-compatible identity</li>
+<li>any implementation can authenticate to a Dina-compatible Home Node</li>
+<li>any implementation can store, import, and export sovereign vault data safely</li>
+<li>any implementation can enforce the same agent-safety contract</li>
+<li>any implementation can participate in Dina-to-Dina coordination</li>
+<li>any implementation can publish to and query the Trust Network</li>
+<li>any implementation can interoperate at the interaction layer, not just the transport layer</li>
+</ul>
+<p>This document is intentionally broader than the current Go/Python/TypeScript reference implementation. Where the implementation already behaves consistently, the document is normative. Where the implementation still contains multiple active profiles or migration-era behavior, the document calls that out explicitly so the protocol can be frozen cleanly later.</p>
+<h2 id="1-scope">1. Scope</h2>
+<p>Dina the product is a sovereign personal AI.</p>
+<p>Dina the protocol is the standard for how humans and their software:</p>
+<ul>
+<li>identify themselves</li>
+<li>authenticate</li>
+<li>protect personal data</li>
+<li>authorize agent access</li>
+<li>coordinate with other sovereign identities</li>
+<li>publish and query trust</li>
+<li>express interactions in a portable way</li>
+</ul>
+<p>This protocol is not only a wire format. It is a layered interoperability contract.</p>
+<h2 id="2-design-goals">2. Design Goals</h2>
+<p>The protocol exists so that:</p>
+<ul>
+<li>a Go, Rust, Swift, Python, or browser-based implementation can interoperate</li>
+<li>a managed hosted Dina and a self-hosted Dina can still speak the same contracts</li>
+<li>a specialist agent can plug into Dina without owning Dina's identity or policy layer</li>
+<li>a D2D request can be fulfilled by a remote Dina regardless of its internal executor</li>
+<li>the Trust Network remains portable across AppViews and Home Nodes</li>
+<li>user interaction semantics remain stable even when implementations differ internally</li>
+<li>implementations can advertise what they support before attempting advanced interop</li>
+<li>optional features can evolve without fragmenting the core protocol</li>
+</ul>
+<h2 id="3-relationship-to-the-interaction-architecture">3. Relationship to the Interaction Architecture</h2>
+<p>This protocol is grounded in the interaction architecture already defined for Dina:</p>
+<ul>
+<li>the full interaction inventory</li>
+<li>the consolidated domain model</li>
+<li>the D2D domain model</li>
+<li>the interaction topology model</li>
+<li>context resolution</li>
+<li>response formatting</li>
+</ul>
+<p>Those documents answer:</p>
+<ul>
+<li>what users and Dinas need to do</li>
+<li>who they interact with</li>
+<li>how requests are grounded</li>
+<li>how results are rendered</li>
+</ul>
+<p>This protocol document answers a different question:</p>
+<ul>
+<li>what independent implementations must agree on to interoperate across all of that</li>
+</ul>
+<h2 id="4-conformance-language">4. Conformance Language</h2>
+<p>The keywords MUST, SHOULD, MAY, MUST NOT, and SHOULD NOT are used in the RFC sense.</p>
+<p>This document distinguishes:</p>
+<ul>
+<li>Protocol contract: what any conforming implementation must do</li>
+<li>Reference behavior: what the current Dina implementation does today</li>
+<li>Open freeze point: a place where the reference implementation still needs one protocol choice to be standardized before a 1.0 release</li>
+<li>Core protocol: the minimum frozen subset every conforming implementation shares</li>
+<li>Profile: a named, optional capability bundle built on top of the core protocol</li>
+<li>Extension: a namespaced optional feature that may be ignored when unsupported</li>
+<li>Profile-qualified compliance: an implementation is Dina-protocol-compliant only with respect to one or more declared profiles, not by vague association with Dina</li>
+</ul>
+<h2 id="5-protocol-shape">5. Protocol Shape</h2>
+<p>The Dina protocol should be strict only where interoperability actually requires strictness.</p>
+<p>Its shape is:</p>
+<ul>
+<li>minimal frozen core</li>
+<li>named conformance profiles</li>
+<li>namespaced extensions</li>
+<li>capability discovery and negotiation</li>
+<li>layered interoperability contracts</li>
+</ul>
+<h3 id="51-minimal-frozen-core">5.1 Minimal Frozen Core</h3>
+<p>The core protocol should freeze only the pieces that must be identical across implementations:</p>
+<ul>
+<li>identity derivation</li>
+<li>signed request authentication</li>
+<li>minimum D2D envelope and lifecycle semantics</li>
+<li>minimum trust namespace subset</li>
+<li>minimum semantic operation set</li>
+<li>minimum response envelope core</li>
+</ul>
+<p>Everything else should remain profile-based or extensible.</p>
+<h3 id="52-profiles">5.2 Profiles</h3>
+<p>Profiles are named bundles of additional behavior on top of the core protocol.</p>
+<p>Examples include:</p>
+<ul>
+<li>Home Node</li>
+<li>Device</li>
+<li>Agent Executor</li>
+<li>Provider Dina</li>
+<li>AppView</li>
+<li>Bridge</li>
+<li>Mobile Home Node</li>
+<li>encrypted vault portability</li>
+</ul>
+<p>Profiles allow an implementation to be fully Dina-compatible without pretending to support every optional behavior.</p>
+<h3 id="53-extensions-and-namespacing">5.3 Extensions and Namespacing</h3>
+<p>The protocol SHOULD allow growth through explicit extension points.</p>
+<p>Extensions SHOULD be:</p>
+<ul>
+<li>namespaced</li>
+<li>discoverable</li>
+<li>ignorable when unsupported</li>
+<li>non-breaking to the core protocol</li>
+</ul>
+<p>Unknown optional extensions MUST NOT cause protocol failure by themselves.</p>
+<p>Failure should occur only when:</p>
+<ul>
+<li>the remote side requires a capability the local side does not support</li>
+<li>or no acceptable common profile can be negotiated</li>
+</ul>
+<h3 id="54-capability-discovery-and-negotiation">5.4 Capability Discovery and Negotiation</h3>
+<p>Conforming implementations SHOULD support both:</p>
+<ul>
+<li>static capability advertisement</li>
+<li>live capability negotiation</li>
+</ul>
+<p>Static capability advertisement answers:</p>
+<ul>
+<li>what this implementation can do in general</li>
+<li>which profiles it implements</li>
+<li>which optional features it understands</li>
+</ul>
+<p>Live capability negotiation answers:</p>
+<ul>
+<li>what these two parties will use for this interaction</li>
+</ul>
+<p>At minimum, a capability advertisement SHOULD declare:</p>
+<ul>
+<li>supported protocol versions</li>
+<li>implemented conformance profiles</li>
+<li>supported authentication methods</li>
+<li>supported D2D message families</li>
+<li>supported semantic operations</li>
+<li>supported request modes and lifecycle states</li>
+<li>supported response envelope versions and response kinds</li>
+<li>supported response extensions and disclosure annotations</li>
+<li>supported trust namespace subsets</li>
+<li>delivery capabilities such as mailbox relay or proactive delivery</li>
+<li>optional storage portability profiles</li>
+<li>relevant limits such as payload size, attachment size, or timeout windows</li>
+</ul>
+<p>Capability advertisement MAY be published through:</p>
+<ul>
+<li>DID service metadata</li>
+<li>a dedicated capability document</li>
+<li>a service discovery endpoint</li>
+<li>another equivalent discovery mechanism</li>
+</ul>
+<p>The protocol should standardize the semantics of capability discovery, not require one single UI or deployment shape.</p>
+<p>Draft machine-readable artifacts for this layer live in:</p>
+<ul>
+<li><code>schemas/capability-advertisement.json</code></li>
+<li><code>schemas/capability-negotiation.json</code></li>
+</ul>
+<p>Live negotiation SHOULD choose, for a given interaction:</p>
+<ul>
+<li>the protocol version</li>
+<li>the authentication method</li>
+<li>the message family or request family</li>
+<li>the request mode</li>
+<li>the response envelope version</li>
+<li>any required extensions</li>
+<li>fallback behavior if advanced features are unavailable</li>
+</ul>
+<p>Two Dina-compatible implementations MUST be able to fall back to their common subset whenever possible.</p>
+<p>An implementation MUST be able to say:</p>
+<ul>
+<li>what it supports</li>
+<li>what it requires</li>
+<li>what it selected for this interaction</li>
+</ul>
+<p>without forcing the remote side to guess.</p>
+<h3 id="55-protocol-layers">5.5 Protocol Layers</h3>
+<p>Dina has six core protocol layers and one cross-cutting interoperability layer.</p>
+<ol>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>Dina-to-Dina Communication</li>
+<li>Trust Network</li>
+<li>Interaction Contract</li>
+</ol>
+<p>The first six are the infrastructure core.</p>
+<p>The seventh is the application interoperability layer that makes all higher-level scenarios portable across implementations.</p>
+<h2 id="6-core-entities">6. Core Entities</h2>
+<p>The protocol recognizes the following principal types:</p>
+<ul>
+<li>Human root identity</li>
+<li>Home Node</li>
+<li>Device</li>
+<li>Internal service</li>
+<li>Agent executor</li>
+<li>Remote Dina</li>
+<li>Provider or organization Dina</li>
+<li>Trust AppView</li>
+</ul>
+<p>The protocol also recognizes the following counterparty classes:</p>
+<ul>
+<li>Person</li>
+<li>Provider</li>
+<li>Institution</li>
+<li>Public infrastructure</li>
+<li>Device or IoT system</li>
+<li>Agent or executor</li>
+</ul>
+<p>These matter because the same user request may route through different fulfillment topologies while preserving the same external contract.</p>
+<p>Every conforming implementation SHOULD also expose enough capability metadata for another Dina-compatible implementation to determine:</p>
+<ul>
+<li>which principal and counterparty roles it can play</li>
+<li>which profiles it implements</li>
+<li>which optional features are safe to attempt</li>
+</ul>
+<h2 id="7-layer-1-identity">7. Layer 1: Identity</h2>
+<h3 id="71-purpose">7.1 Purpose</h3>
+<p>Identity defines who a sovereign participant is and how other implementations recognize that participant.</p>
+<h3 id="72-protocol-requirements">7.2 Protocol Requirements</h3>
+<p>A Dina-compatible identity system MUST define:</p>
+<ul>
+<li>a recoverable root secret</li>
+<li>deterministic key derivation rules</li>
+<li>a DID representation</li>
+<li>a DID document or equivalent resolution record</li>
+<li>a key rotation model</li>
+<li>service endpoint discovery</li>
+</ul>
+<h3 id="73-root-secret-model">7.3 Root Secret Model</h3>
+<p>The intended Dina identity model is:</p>
+<ul>
+<li>generate a BIP-39 mnemonic</li>
+<li>derive root key material from that mnemonic</li>
+<li>derive protocol-specific subkeys under a Dina-specific purpose path</li>
+</ul>
+<p>The Dina-specific HD namespace is:</p>
+<ul>
+<li><code>m/9999'/0'/...</code> root identity signing</li>
+<li><code>m/9999'/1'/...</code> persona and sub-identity signing</li>
+<li><code>m/9999'/2'/...</code> PLC recovery / rotation</li>
+<li><code>m/9999'/3'/...</code> service-to-service authentication</li>
+</ul>
+<p>This prevents collision with wallet ecosystems such as BIP-44.</p>
+<h3 id="74-current-reference-implementation">7.4 Current Reference Implementation</h3>
+<p>The current Dina reference implementation already uses:</p>
+<ul>
+<li>BIP-39 recovery phrases on the CLI side</li>
+<li>SLIP-0010 hardened derivation under <code>m/9999'/...</code></li>
+<li>Ed25519 for identity and service signing</li>
+<li>secp256k1 for PLC recovery / rotation keys</li>
+</ul>
+<p>Concrete derivation paths in the current implementation include:</p>
+<ul>
+<li><code>m/9999'/0'/0'</code> root signing generation 0</li>
+<li><code>m/9999'/0'/&lt;generation&gt;'</code> subsequent root signing generations</li>
+<li><code>m/9999'/1'/&lt;personaIndex&gt;'/&lt;generation&gt;'</code> persona signing</li>
+<li><code>m/9999'/2'/&lt;generation&gt;'</code> PLC recovery / rotation</li>
+<li><code>m/9999'/3'/&lt;serviceIndex&gt;'</code> service authentication</li>
+</ul>
+<h3 id="75-did-methods">7.5 DID Methods</h3>
+<p>A Dina-compatible Home Node SHOULD expose a <code>did:plc</code> identity.</p>
+<p>Device and service principals MAY use:</p>
+<ul>
+<li><code>did:key</code></li>
+<li><code>did:plc</code></li>
+<li><code>did:web</code></li>
+</ul>
+<p>The current reference implementation accepts all three DID prefixes at the domain layer, while using <code>did:plc</code> as the primary Home Node identity and <code>did:key</code> for CLI device identities.</p>
+<h3 id="76-did-document-requirements">7.6 DID Document Requirements</h3>
+<p>A Dina-compatible DID document SHOULD expose:</p>
+<ul>
+<li>one or more Ed25519 verification methods in multikey format</li>
+<li>authentication references</li>
+<li>service endpoints for Dina messaging and other declared capabilities</li>
+</ul>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>Ed25519 multikeys with the <code>0xed01</code> multicodec prefix</li>
+<li>a Dina messaging service endpoint, typically <code>DinaMsgBox</code></li>
+</ul>
+<h3 id="77-rotation-and-recovery">7.7 Rotation and Recovery</h3>
+<p>Home Node identities MUST support key rotation.</p>
+<p>For <code>did:plc</code>, rotation SHOULD be driven through a recovery key distinct from the root signing key.</p>
+<p>The current reference implementation derives PLC recovery keys from the dedicated <code>m/9999'/2'/...</code> subtree and supports PDS/PLC-backed DID lifecycle operations.</p>
+<h3 id="78-protocol-freeze-point">7.8 Protocol Freeze Point</h3>
+<p>The reference implementation currently has an unresolved identity-root question:</p>
+<ul>
+<li>some code paths treat the root as raw 32-byte entropy rendered as a BIP-39 mnemonic</li>
+<li>some documentation and tests treat the root as the 64-byte BIP-39 PBKDF2-expanded seed</li>
+</ul>
+<p>Before Dina Protocol 1.0 is frozen, the protocol MUST standardize one root key material profile for downstream derivation.</p>
+<p>Recommended direction:</p>
+<ul>
+<li>recovery secret: 24-word BIP-39 mnemonic</li>
+<li>canonical root key material: BIP-39 PBKDF2-expanded seed</li>
+<li>deterministic subkey derivation from that canonical root key material</li>
+</ul>
+<h2 id="8-layer-2-authentication">8. Layer 2: Authentication</h2>
+<h3 id="81-purpose">8.1 Purpose</h3>
+<p>Authentication defines how a participant proves who it is.</p>
+<h3 id="82-protocol-requirements">8.2 Protocol Requirements</h3>
+<p>A Dina-compatible authentication profile MUST support signed requests using Ed25519.</p>
+<p>The canonical signing payload is:</p>
+<div class="codehilite"><pre><span></span><code>METHOD
+PATH
+QUERY
+TIMESTAMP
+NONCE
+SHA256_HEX(BODY)
+</code></pre></div>
+
+<p>The current reference implementation signs exactly this payload.</p>
+<p>A draft normalized schema for signed-request interoperability lives in:</p>
+<ul>
+<li><code>schemas/auth-envelope.json</code></li>
+</ul>
+<h3 id="83-http-header-contract">8.3 HTTP Header Contract</h3>
+<p>A signed HTTP request SHOULD carry:</p>
+<ul>
+<li><code>X-DID</code></li>
+<li><code>X-Timestamp</code></li>
+<li><code>X-Nonce</code></li>
+<li><code>X-Signature</code></li>
+</ul>
+<p><code>X-Signature</code> is the Ed25519 signature over the canonical payload.</p>
+<h3 id="84-replay-protection">8.4 Replay Protection</h3>
+<p>A conforming implementation MUST protect against replay.</p>
+<p>The reference implementation currently enforces:</p>
+<ul>
+<li>a 5-minute clock skew window</li>
+<li>a per-request nonce</li>
+<li>a double-buffer nonce cache for O(1) rotation and replay rejection</li>
+</ul>
+<h3 id="85-device-pairing">8.5 Device Pairing</h3>
+<p>A Dina-compatible Home Node SHOULD support device pairing as a bootstrap flow.</p>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>a 6-digit pairing code</li>
+<li>5-minute TTL</li>
+<li>single-use semantics</li>
+<li>a cryptographic secret behind the visible code</li>
+</ul>
+<p>Pairing MAY result in either:</p>
+<ul>
+<li>a registered Ed25519 device key</li>
+<li>a paired bearer token for compatibility or bootstrap flows</li>
+</ul>
+<h3 id="86-service-keys">8.6 Service Keys</h3>
+<p>Internal or peer services MAY authenticate with distinct service Ed25519 keypairs.</p>
+<p>This is already present in the reference implementation for Core-to-Brain and similar service paths.</p>
+<h3 id="87-auth-modes">8.7 Auth Modes</h3>
+<p>The Dina protocol recognizes at least these auth modes:</p>
+<ul>
+<li>device_signature</li>
+<li>service_signature</li>
+<li>paired_token</li>
+<li>browser_session</li>
+</ul>
+<p>The protocol SHOULD treat signature-based authentication as the primary interoperable profile.</p>
+<p>Paired bearer tokens are acceptable as a bootstrap or compatibility profile, but SHOULD NOT be the normative long-term cross-implementation trust model.</p>
+<h3 id="88-caller-model">8.8 Caller Model</h3>
+<p>A Dina-compatible implementation SHOULD propagate caller context containing at least:</p>
+<ul>
+<li>principal</li>
+<li>actor</li>
+<li>origin</li>
+<li>auth_mode</li>
+</ul>
+<p>This becomes important for:</p>
+<ul>
+<li>vault access policy</li>
+<li>approvals</li>
+<li>audit</li>
+<li>D2D relaying</li>
+<li>executor mediation</li>
+</ul>
+<h2 id="9-layer-3-encrypted-storage">9. Layer 3: Encrypted Storage</h2>
+<h3 id="91-purpose">9.1 Purpose</h3>
+<p>Encrypted Storage defines how personal data is protected and made portable across implementations.</p>
+<h3 id="92-protocol-requirements">9.2 Protocol Requirements</h3>
+<p>A Dina-compatible storage system MUST provide:</p>
+<ul>
+<li>per-persona isolation</li>
+<li>encryption at rest</li>
+<li>typed vault records</li>
+<li>provenance and trust fields</li>
+<li>staging / pending approval support</li>
+<li>import/export at the logical schema level</li>
+</ul>
+<h3 id="93-persona-model">9.3 Persona Model</h3>
+<p>The protocol persona tiers are:</p>
+<ul>
+<li><code>default</code></li>
+<li><code>standard</code></li>
+<li><code>sensitive</code></li>
+<li><code>locked</code></li>
+</ul>
+<p>These tiers are already present in the reference implementation.</p>
+<p>Expected semantics:</p>
+<ul>
+<li><code>default</code>: always open, minimal friction</li>
+<li><code>standard</code>: open by policy, agent access requires scoped grants</li>
+<li><code>sensitive</code>: closed by default, requires approval</li>
+<li><code>locked</code>: passphrase or explicit unlock, agent access denied or highly restricted</li>
+</ul>
+<h3 id="94-physical-storage-profile">9.4 Physical Storage Profile</h3>
+<p>A Dina-compatible Home Node SHOULD use an encrypted SQL store per persona.</p>
+<p>The reference implementation uses SQLCipher-backed SQLite databases, one per persona, with encrypted-at-rest FTS and embedding storage.</p>
+<h3 id="95-logical-vault-schema">9.5 Logical Vault Schema</h3>
+<p>A Dina-compatible vault item model MUST be able to express:</p>
+<ul>
+<li>stable ID</li>
+<li>item type</li>
+<li>content</li>
+<li>metadata</li>
+<li>tags</li>
+<li>timestamps</li>
+<li>source and provenance</li>
+<li>trust and confidence</li>
+<li>retrieval policy</li>
+<li>optional embeddings</li>
+<li>optional redacted or tiered content views</li>
+</ul>
+<p>The reference implementation's persona schema currently includes logical fields such as:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>type</code></li>
+<li><code>source</code></li>
+<li><code>source_id</code></li>
+<li><code>contact_did</code></li>
+<li><code>summary</code></li>
+<li><code>body</code></li>
+<li><code>metadata</code></li>
+<li><code>tags</code></li>
+<li><code>timestamp</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+<li><code>sender</code></li>
+<li><code>sender_trust</code></li>
+<li><code>source_type</code></li>
+<li><code>confidence</code></li>
+<li><code>retrieval_policy</code></li>
+<li><code>content_l0</code></li>
+<li><code>content_l1</code></li>
+</ul>
+<p>The protocol SHOULD freeze the logical schema, not the exact SQL DDL.</p>
+<h3 id="96-search-and-semantic-hydration">9.6 Search and Semantic Hydration</h3>
+<p>The protocol SHOULD support:</p>
+<ul>
+<li>lexical search</li>
+<li>semantic retrieval</li>
+<li>staging before persistence</li>
+</ul>
+<p>The reference implementation currently provides:</p>
+<ul>
+<li>FTS5 over summary, body, tags, and contact surfaces</li>
+<li>HNSW vector search loaded only while a persona is unlocked</li>
+</ul>
+<p>Important storage rule:</p>
+<ul>
+<li>embeddings MUST be encrypted at rest</li>
+<li>in-memory vector indices MUST be destroyed on persona lock</li>
+</ul>
+<h3 id="97-backup-and-export">9.7 Backup and Export</h3>
+<p>Base Dina storage interoperability is logical, not file-format-level.</p>
+<p>At minimum, conforming implementations MUST support:</p>
+<ul>
+<li>logical export of vault contents, metadata, provenance, and trust fields</li>
+<li>logical import of that same material into another Dina-compatible implementation</li>
+<li>explicit user intent for any decrypted export</li>
+<li>clear marking of insecure or plaintext exports</li>
+</ul>
+<p>Implementations MUST NOT create silent plaintext backups as a side effect of normal backup or migration.</p>
+<p>Safe profiles therefore separate:</p>
+<ul>
+<li>logical portability: required for protocol interoperability</li>
+<li>encrypted vault portability: optional profile, if implementations want direct encrypted file interchange or seed-based vault recovery</li>
+</ul>
+<h3 id="98-encrypted-vault-portability-profile">9.8 Encrypted Vault Portability Profile</h3>
+<p>The current implementation has more than one active DEK derivation style:</p>
+<ul>
+<li>an HKDF profile of the form <code>dina:vault:&lt;persona&gt;:v1</code> with a user salt</li>
+<li>a versioned persona profile of the form <code>dina:persona:&lt;name&gt;:dek:vN</code> with deterministic persona-scoped salt</li>
+</ul>
+<p>This matters only if the protocol wants to guarantee one of the following:</p>
+<ul>
+<li>opening an encrypted vault file across implementations</li>
+<li>seed-based recovery of encrypted vault material without logical export</li>
+<li>encrypted backup portability without re-encryption</li>
+</ul>
+<p>Those guarantees are useful, but they are not required for base Dina interoperability.</p>
+<p>Therefore Protocol 1.0 MAY defer canonical DEK derivation at the core layer, provided it freezes:</p>
+<ul>
+<li>the logical vault schema</li>
+<li>the logical export/import contract</li>
+<li>explicit metadata describing any encrypted-vault portability profile</li>
+</ul>
+<p>If an encrypted vault portability profile is later standardized, it SHOULD define:</p>
+<ul>
+<li>the canonical DEK derivation profile</li>
+<li>DEK version metadata</li>
+<li>migration and re-encryption rules</li>
+<li>profile negotiation or profile declaration during import/export</li>
+</ul>
+<h2 id="10-layer-4-agent-safety">10. Layer 4: Agent Safety</h2>
+<h3 id="101-purpose">10.1 Purpose</h3>
+<p>Agent Safety defines how agents interact with personal data and external systems without collapsing user sovereignty.</p>
+<h3 id="102-protocol-requirements">10.2 Protocol Requirements</h3>
+<p>A Dina-compatible safety layer MUST provide:</p>
+<ul>
+<li>session-scoped access</li>
+<li>approval requests</li>
+<li>scoped grants</li>
+<li>intent evaluation</li>
+<li>egress controls</li>
+<li>PII scrubbing</li>
+<li>auditability</li>
+</ul>
+<h3 id="103-session-and-grant-model">10.3 Session and Grant Model</h3>
+<p>The reference implementation already models:</p>
+<ul>
+<li>named agent sessions</li>
+<li>active vs ended session state</li>
+<li>grants scoped to a session</li>
+<li>revocation of all grants on session end</li>
+</ul>
+<p>An interoperable session model SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>name</code></li>
+<li><code>agent_did</code></li>
+<li><code>status</code></li>
+<li><code>created_at</code></li>
+<li><code>last_activity_at</code></li>
+<li><code>ended_at</code></li>
+</ul>
+<p>An interoperable access grant SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>client_did</code></li>
+<li><code>persona_id</code></li>
+<li><code>session_id</code></li>
+<li><code>scope</code></li>
+<li><code>expires_at</code></li>
+<li><code>granted_by</code></li>
+<li><code>reason</code></li>
+</ul>
+<p>Grant scopes SHOULD at least distinguish:</p>
+<ul>
+<li>single</li>
+<li>session</li>
+</ul>
+<h3 id="104-approval-model">10.4 Approval Model</h3>
+<p>An approval request MUST be portable across implementations.</p>
+<p>Minimum approval fields SHOULD include:</p>
+<ul>
+<li><code>id</code></li>
+<li><code>type</code></li>
+<li><code>client_did</code></li>
+<li><code>persona_id</code></li>
+<li><code>session_id</code></li>
+<li><code>action</code></li>
+<li><code>scope</code></li>
+<li><code>status</code></li>
+<li><code>reason</code></li>
+<li><code>preview</code></li>
+<li><code>granted_by</code></li>
+<li><code>expires_at</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<p>The reference implementation already exposes this shape.</p>
+<p>A draft machine-readable schema for this contract lives in:</p>
+<ul>
+<li><code>schemas/approval-request.json</code></li>
+</ul>
+<p>Approval types currently include:</p>
+<ul>
+<li><code>persona_access</code></li>
+<li><code>action_intent</code></li>
+</ul>
+<h3 id="105-intent-evaluation">10.5 Intent Evaluation</h3>
+<p>A Dina-compatible agent safety layer MUST require agents to declare intent.</p>
+<p>The current reference intent model is:</p>
+<ul>
+<li><code>agent_did</code></li>
+<li><code>action</code></li>
+<li><code>target</code></li>
+<li><code>persona_id</code></li>
+<li><code>trust_level</code></li>
+<li><code>constraints</code></li>
+</ul>
+<p>The current reference decision model is:</p>
+<ul>
+<li><code>allowed</code></li>
+<li><code>reason</code></li>
+<li><code>audit</code></li>
+</ul>
+<p>A draft machine-readable schema for executor intent declaration lives in:</p>
+<ul>
+<li><code>schemas/agent-intent.json</code></li>
+</ul>
+<h3 id="106-safety-rules">10.6 Safety Rules</h3>
+<p>At protocol level, Dina safety has four core principles:</p>
+<ul>
+<li>safe reads and reasoning may pass silently</li>
+<li>risky actions require review</li>
+<li>untrusted agents are denied by default</li>
+<li>raw sensitive data must not leave the node without policy checks</li>
+</ul>
+<p>The reference gatekeeper already treats actions such as:</p>
+<ul>
+<li><code>send_email</code></li>
+<li><code>transfer_money</code></li>
+<li><code>share_data</code></li>
+</ul>
+<p>as risky actions that require explicit user review.</p>
+<h3 id="107-pii-scrubbing">10.7 PII Scrubbing</h3>
+<p>A Dina-compatible implementation MUST support PII scrubbing before cloud or third-party egress.</p>
+<p>The reference implementation currently provides:</p>
+<ul>
+<li>Tier 1: regex-based scrubbing for structured PII</li>
+<li>Tier 2: Brain-assisted structured or NER-assisted scrubbing</li>
+</ul>
+<p>The protocol SHOULD allow additional tiers, but MUST preserve the contract that scrubbed text can be safely passed onward and later rehydrated only within an authorized local context.</p>
+<h3 id="108-audit">10.8 Audit</h3>
+<p>Every approval, denial, sensitive access, or denied egress SHOULD be auditable.</p>
+<p>This is already present in the reference implementation and should remain a required interoperability expectation for serious implementations.</p>
+<h2 id="11-layer-5-dina-to-dina-communication">11. Layer 5: Dina-to-Dina Communication</h2>
+<h3 id="111-purpose">11.1 Purpose</h3>
+<p>D2D defines how two sovereign identities coordinate securely.</p>
+<p>It is not just a transport channel. It is a policy-aware, trust-aware coordination layer between two human-centered systems.</p>
+<h3 id="112-protocol-requirements">11.2 Protocol Requirements</h3>
+<p>A Dina-compatible D2D layer MUST provide:</p>
+<ul>
+<li>DID resolution for endpoint discovery</li>
+<li>sender authentication</li>
+<li>message confidentiality</li>
+<li>typed message families</li>
+<li>replay protection</li>
+<li>outbox / offline delivery semantics</li>
+<li>contact and sharing policy enforcement</li>
+</ul>
+<h3 id="113-wire-model">11.3 Wire Model</h3>
+<p>The reference implementation currently uses:</p>
+<ul>
+<li>Ed25519 signatures over plaintext messages</li>
+<li>Ed25519-to-X25519 conversion for encryption</li>
+<li>NaCl sealed box encryption</li>
+<li>a JSON wrapper containing ciphertext and signature</li>
+</ul>
+<p>The current transport wrapper is effectively:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;base64 ciphertext&gt;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;s&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;hex ed25519 signature over plaintext&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The plaintext message model is currently:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;msg-123&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;coordination.request&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;from&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:plc:sender&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;did:plc:recipient&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;created_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1710000000</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;body&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="114-message-families">11.4 Message Families</h3>
+<p>The current Dina D2D v1 families are:</p>
+<ul>
+<li><code>presence.signal</code></li>
+<li><code>coordination.request</code></li>
+<li><code>coordination.response</code></li>
+<li><code>social.update</code></li>
+<li><code>safety.alert</code></li>
+<li><code>trust.vouch.request</code></li>
+<li><code>trust.vouch.response</code></li>
+</ul>
+<p>These are the transport-level v1 families the current implementation accepts as its strict D2D surface.</p>
+<h3 id="115-message-policy">11.5 Message Policy</h3>
+<p>The current scenario policy model is:</p>
+<ul>
+<li><code>standing_policy</code></li>
+<li><code>explicit_once</code></li>
+<li><code>deny_by_default</code></li>
+</ul>
+<p>Default scenario families in the reference implementation currently map roughly to:</p>
+<ul>
+<li>presence: standing</li>
+<li>coordination: standing</li>
+<li>social: standing</li>
+<li>safety: standing</li>
+<li>trust: explicit_once</li>
+</ul>
+<p><code>safety.alert</code> is treated as a special always-pass inbound case.</p>
+<h3 id="116-contact-and-sharing-policy">11.6 Contact and Sharing Policy</h3>
+<p>D2D interoperability requires more than cryptography.</p>
+<p>It also requires:</p>
+<ul>
+<li>explicit contact state</li>
+<li>trust ring</li>
+<li>entity resolution mode</li>
+<li>per-category sharing policy</li>
+</ul>
+<p>The reference implementation already models:</p>
+<ul>
+<li>trust rings</li>
+<li>resolution modes such as late binding vs plaintext</li>
+<li>per-category sharing tiers</li>
+</ul>
+<p>This is critical for person-to-person interoperability because "can I reach this Dina" and "what may I disclose to this Dina" are different questions.</p>
+<h3 id="117-outbox-and-offline-delivery">11.7 Outbox and Offline Delivery</h3>
+<p>A conforming implementation SHOULD support durable offline delivery.</p>
+<p>The reference implementation already has:</p>
+<ul>
+<li>durable outbox records</li>
+<li>retries with exponential backoff</li>
+<li>pending approval state</li>
+<li>delivered vs failed state</li>
+<li>support for a Dina message box endpoint</li>
+</ul>
+<p>Outbox states currently include:</p>
+<ul>
+<li><code>pending</code></li>
+<li><code>pending_approval</code></li>
+<li><code>sending</code></li>
+<li><code>delivered</code></li>
+<li><code>failed</code></li>
+</ul>
+<h3 id="118-replay-and-verification">11.8 Replay and Verification</h3>
+<p>A D2D implementation MUST reject replayed messages.</p>
+<p>The reference implementation uses <code>senderDID|messageID</code> replay tracking and verifies inbound signatures against resolved verification methods.</p>
+<h3 id="119-federated-execution">11.9 Federated Execution</h3>
+<p>This is where interaction learnings materially expand the protocol.</p>
+<p>A remote Dina is not just a mailbox. It may act as an orchestrator.</p>
+<p>Therefore the protocol MUST allow the following D2D fulfillment patterns:</p>
+<ul>
+<li>direct response</li>
+<li>remote query</li>
+<li>remote delegated execution</li>
+<li>remote monitoring or subscription</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>your Dina asks a transit operator Dina for a bus ETA</li>
+<li>the transit Dina may query its own database, call traffic systems, or invoke its own task executor</li>
+<li>your Dina receives a protocol-level outcome, not the transit Dina's internal implementation details</li>
+</ul>
+<p>For this reason, D2D interop SHOULD standardize a generic request-state plane.</p>
+<p>Recommended request modes are:</p>
+<ul>
+<li><code>inline_preferred</code></li>
+<li><code>async</code></li>
+<li><code>subscription</code></li>
+</ul>
+<p>Recommended lifecycle states are:</p>
+<ul>
+<li><code>accepted</code></li>
+<li><code>waiting_approval</code></li>
+<li><code>waiting_input</code></li>
+<li><code>running</code></li>
+<li><code>partial</code></li>
+<li><code>completed</code></li>
+<li><code>failed</code></li>
+<li><code>cancelled</code></li>
+<li><code>expired</code></li>
+</ul>
+<p>Required fields in a generic D2D request-state object SHOULD include:</p>
+<ul>
+<li><code>request_id</code></li>
+<li><code>correlation_id</code></li>
+<li><code>requested_capability</code></li>
+<li><code>response_mode</code></li>
+<li><code>status</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<p>Optional fields SHOULD include:</p>
+<ul>
+<li><code>result</code></li>
+<li><code>error</code></li>
+<li><code>retryable</code></li>
+<li><code>progress</code></li>
+<li><code>percent</code></li>
+<li><code>eta</code></li>
+<li><code>expires_at</code></li>
+<li><code>provenance</code></li>
+<li><code>requires_human</code></li>
+<li><code>next_action</code></li>
+</ul>
+<p>Support for request modes, lifecycle states, and optional fields SHOULD be advertised through the capability discovery layer so that remote peers know the highest common lifecycle they can use.</p>
+<p>The current v1 transport families do not yet fully freeze this generic request-state plane. That is an open standardization task before Protocol 1.0.</p>
+<p>Draft machine-readable artifacts for D2D interop live in:</p>
+<ul>
+<li><code>schemas/d2d-envelope.json</code></li>
+<li><code>schemas/capability-advertisement.json</code></li>
+<li><code>schemas/capability-negotiation.json</code></li>
+</ul>
+<h2 id="12-layer-6-trust-network">12. Layer 6: Trust Network</h2>
+<h3 id="121-purpose">12.1 Purpose</h3>
+<p>Trust defines how Dina-compatible systems publish verifiable outcomes and query world trust.</p>
+<h3 id="122-protocol-requirements">12.2 Protocol Requirements</h3>
+<p>A Dina-compatible trust layer MUST support:</p>
+<ul>
+<li>attributable signed trust records</li>
+<li>public indexing</li>
+<li>retraction or revocation</li>
+<li>subject resolution</li>
+<li>queryable trust profiles</li>
+</ul>
+<h3 id="123-write-path">12.3 Write Path</h3>
+<p>The intended Dina trust write model is:</p>
+<ul>
+<li>Home Nodes publish signed records to an AT Protocol PDS</li>
+<li>a relay and indexer ingest those records</li>
+<li>AppViews serve read-side query results</li>
+</ul>
+<p>The current reference implementation already has:</p>
+<ul>
+<li>PDS publishing through XRPC</li>
+<li><code>did:plc</code>-backed repo writes</li>
+<li>AppView-oriented query handlers</li>
+</ul>
+<h3 id="124-collection-namespace">12.4 Collection Namespace</h3>
+<p>The protocol trust namespace is <code>com.dina.trust.*</code>.</p>
+<p>The current broader design already includes a large set of collections, including families such as:</p>
+<ul>
+<li>attestation</li>
+<li>vouch</li>
+<li>endorsement</li>
+<li>flag</li>
+<li>reply</li>
+<li>reaction</li>
+<li>reportRecord</li>
+<li>revocation</li>
+<li>delegation</li>
+<li>collection</li>
+<li>media</li>
+<li>subject</li>
+<li>amendment</li>
+<li>verification</li>
+<li>reviewRequest</li>
+<li>comparison</li>
+<li>subjectClaim</li>
+<li>trustPolicy</li>
+<li>notificationPrefs</li>
+</ul>
+<p>The protocol MUST freeze at least a minimal required subset for 1.0.</p>
+<p>Recommended minimal core subset:</p>
+<ul>
+<li><code>com.dina.trust.attestation</code></li>
+<li><code>com.dina.trust.vouch</code></li>
+<li><code>com.dina.trust.flag</code></li>
+<li><code>com.dina.trust.revocation</code></li>
+<li><code>com.dina.trust.verification</code></li>
+</ul>
+<h3 id="125-read-contract">12.5 Read Contract</h3>
+<p>A Dina-compatible AppView SHOULD expose read-side queries for:</p>
+<ul>
+<li>resolve profile</li>
+<li>search trust</li>
+<li>fetch attestations</li>
+<li>fetch graph or neighborhood</li>
+</ul>
+<p>The reference implementation already exposes local Home Node handlers that proxy profile resolve and search to an AppView.</p>
+<h3 id="126-trust-score-semantics">12.6 Trust Score Semantics</h3>
+<p>The protocol MUST separate:</p>
+<ul>
+<li>record interoperability</li>
+<li>score algorithm interoperability</li>
+</ul>
+<p>Write interoperability requires a stable record namespace and shape.</p>
+<p>Read interoperability requires that a trust profile can at least expose:</p>
+<ul>
+<li>trust score</li>
+<li>confidence</li>
+<li>ring or classification</li>
+<li>evidence summary</li>
+<li>active flags or warnings</li>
+</ul>
+<p>Exact scoring algorithms, including EigenTrust-style convergence, SHOULD be published as profile definitions rather than assumed to be globally frozen at the protocol core.</p>
+<h3 id="127-privacy-rule">12.7 Privacy Rule</h3>
+<p>The Trust Network MUST NOT become a backdoor for private vault disclosure.</p>
+<p>Only explicitly publishable, signed, public trust records belong in the trust layer.</p>
+<h2 id="13-layer-7-interaction-contract">13. Layer 7: Interaction Contract</h2>
+<h3 id="131-purpose">13.1 Purpose</h3>
+<p>This is the missing interoperability layer most systems ignore.</p>
+<p>Without it, two implementations may share identity, auth, D2D, and trust but still fail to behave similarly from the user's point of view.</p>
+<p>The Interaction Contract layer standardizes:</p>
+<ul>
+<li>what a user-level operation means</li>
+<li>what a proactive Dina-to-human delivery means</li>
+<li>what result shape is expected</li>
+<li>how one external interaction may decompose internally</li>
+<li>how requests are grounded into structured context</li>
+</ul>
+<h3 id="132-semantic-operation-registry">13.2 Semantic Operation Registry</h3>
+<p>The protocol SHOULD standardize semantic operation types, not command spellings.</p>
+<p>The registry itself is already part of the protocol design. The remaining 1.0 work is to freeze:</p>
+<ul>
+<li>the mandatory core subset</li>
+<li>extension rules for vendor- or profile-specific operations</li>
+<li>machine-readable schema for operation declaration and validation</li>
+</ul>
+<p>Implementations SHOULD advertise their supported semantic operations through the capability discovery layer rather than forcing remote peers to infer them from product-specific UI or command names.</p>
+<p>Recommended primary semantic operations are:</p>
+<ul>
+<li><code>remember_context</code></li>
+<li><code>answer_now</code></li>
+<li><code>propose_plan</code></li>
+<li><code>communicate_person</code></li>
+<li><code>request_service</code></li>
+<li><code>delegate_task</code></li>
+<li><code>watch_condition</code></li>
+</ul>
+<p>Control operations:</p>
+<ul>
+<li><code>approve_operation</code></li>
+<li><code>inspect_status</code></li>
+<li><code>modify_existing</code></li>
+<li><code>cancel_operation</code></li>
+<li><code>recover_operation</code></li>
+</ul>
+<p>Resource operations:</p>
+<ul>
+<li><code>manage_contact</code></li>
+<li><code>manage_config</code></li>
+<li><code>manage_device</code></li>
+<li><code>manage_session</code></li>
+<li><code>inspect_audit</code></li>
+</ul>
+<p>Trust operations:</p>
+<ul>
+<li><code>query_trust</code></li>
+<li><code>publish_review</code></li>
+<li><code>publish_vouch</code></li>
+<li><code>publish_flag</code></li>
+</ul>
+<p>Outbound delivery operations:</p>
+<ul>
+<li><code>deliver_briefing</code></li>
+<li><code>deliver_alert</code></li>
+<li><code>deliver_update</code></li>
+<li><code>deliver_completion</code></li>
+<li><code>deliver_failure</code></li>
+<li><code>request_clarification</code></li>
+<li><code>escalate_attention</code></li>
+</ul>
+<p>These are protocol semantics, not command names.</p>
+<p>One implementation might expose:</p>
+<ul>
+<li><code>/ask</code></li>
+<li><code>/plan</code></li>
+<li><code>/send</code></li>
+<li><code>/request</code></li>
+</ul>
+<p>Another might expose:</p>
+<ul>
+<li><code>/query</code></li>
+<li><code>/advise</code></li>
+<li><code>/message</code></li>
+<li><code>/service</code></li>
+</ul>
+<p>Another might expose no slash commands at all and use only buttons, forms, or plain language.</p>
+<p>All of them remain interoperable if they preserve the same semantic contracts.</p>
+<h3 id="132a-outbound-delivery-semantics">13.2A Outbound Delivery Semantics</h3>
+<p>The interaction protocol is not only human -&gt; Dina.</p>
+<p>It must also standardize when Dina speaks to the human without a fresh inbound command.</p>
+<p>At minimum, a conforming implementation SHOULD support these proactive delivery semantics:</p>
+<ul>
+<li><code>deliver_briefing</code>: aggregated, priority-ranked summary</li>
+<li><code>deliver_alert</code>: immediate fiduciary or harm-preventing notice</li>
+<li><code>deliver_update</code>: non-terminal progress or state change</li>
+<li><code>deliver_completion</code>: solicited work reached a useful terminal point</li>
+<li><code>deliver_failure</code>: solicited work failed or became invalid</li>
+<li><code>request_clarification</code>: Dina cannot proceed safely without more input</li>
+<li><code>escalate_attention</code>: a previously lower-priority item now requires interruption</li>
+</ul>
+<p>These are semantic contracts, not UI prescriptions.</p>
+<p>One implementation may show a push notification.<br />
+Another may add a notification center item.<br />
+Another may surface the item only in a daily briefing.</p>
+<h3 id="133-reference-mapping">13.3 Reference Mapping</h3>
+<p>The current Dina reference product maps its external command surface approximately as follows:</p>
+<ul>
+<li><code>/remember</code> -&gt; <code>remember_context</code></li>
+<li><code>/ask</code> -&gt; <code>answer_now</code></li>
+<li><code>/plan</code> -&gt; <code>propose_plan</code></li>
+<li><code>/send</code> -&gt; <code>communicate_person</code></li>
+<li><code>/request</code> -&gt; <code>request_service</code></li>
+<li><code>/task</code> -&gt; <code>delegate_task</code></li>
+<li><code>/watch</code> -&gt; <code>watch_condition</code></li>
+<li><code>/approve</code> -&gt; <code>approve_operation</code></li>
+<li><code>/status</code> -&gt; <code>inspect_status</code></li>
+<li><code>/edit</code> -&gt; <code>modify_existing</code></li>
+<li><code>/cancel</code> -&gt; <code>cancel_operation</code></li>
+<li><code>/recover</code> -&gt; <code>recover_operation</code></li>
+</ul>
+<p>Resource examples:</p>
+<ul>
+<li><code>/contact ...</code> -&gt; <code>manage_contact</code></li>
+<li><code>/config ...</code> -&gt; <code>manage_config</code></li>
+<li><code>/device ...</code> -&gt; <code>manage_device</code></li>
+<li><code>/session ...</code> -&gt; <code>manage_session</code></li>
+<li><code>/audit ...</code> -&gt; <code>inspect_audit</code></li>
+</ul>
+<p>Trust examples:</p>
+<ul>
+<li><code>/trust</code> -&gt; <code>query_trust</code></li>
+<li><code>/review</code> -&gt; <code>publish_review</code></li>
+<li><code>/vouch</code> -&gt; <code>publish_vouch</code></li>
+<li><code>/flag</code> -&gt; <code>publish_flag</code></li>
+</ul>
+<p>This mapping is explicitly non-normative.</p>
+<h3 id="134-outer-contract-vs-execution-graph">13.4 Outer Contract vs Execution Graph</h3>
+<p>This is the key interaction rule:</p>
+<ul>
+<li>the external operation defines the outer contract</li>
+<li>the implementation is free to build the internal execution graph</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>an <code>answer_now</code> operation may internally decompose into <code>answer_now + request_service + propose_plan + context_resolution</code></li>
+<li>a <code>propose_plan</code> operation may internally decompose into <code>answer_now + compare + synthesize</code></li>
+<li>a <code>delegate_task</code> operation may internally decompose into <code>propose_plan + answer_now + request_service + watch_condition</code></li>
+<li>a <code>watch_condition</code> operation may internally decompose into <code>request_service + subscribe + status_tracking</code></li>
+</ul>
+<p>This rule is required to handle real scenarios such as:</p>
+<ul>
+<li>asking a remote transit Dina for a bus ETA</li>
+<li>planning a commute from live traffic and calendar data</li>
+<li>delegating long-running research to a remote executor</li>
+<li>monitoring a service or delivery and alerting later</li>
+</ul>
+<h3 id="134a-multi-turn-interaction-frames">13.4A Multi-Turn Interaction Frames</h3>
+<p>The protocol SHOULD model interactions as frames, not isolated stateless turns.</p>
+<p>An interaction frame SHOULD carry at least:</p>
+<ul>
+<li>current outer contract</li>
+<li>resolved entities and context</li>
+<li>pending clarification</li>
+<li>proposed options or candidate actions</li>
+<li>any active approval or execution state</li>
+</ul>
+<p>Follow-up turns SHOULD remain within the existing outer contract unless the user clearly pivots.</p>
+<p>Examples:</p>
+<ul>
+<li>disambiguation remains inside the current contract</li>
+<li>correction remains inside the current contract</li>
+<li>selecting an option from a prior plan starts a new execution contract with the plan retained as provenance</li>
+</ul>
+<h3 id="135-counterparty-classes">13.5 Counterparty Classes</h3>
+<p>The interaction protocol SHOULD distinguish:</p>
+<ul>
+<li>person-oriented communication</li>
+<li>provider or institution request</li>
+<li>infrastructure request</li>
+<li>device request</li>
+<li>delegated executor request</li>
+</ul>
+<p>This distinction matters because:</p>
+<ul>
+<li><code>communicate_person</code> is different from <code>request_service</code></li>
+<li>a D2D social exchange is different from a provider action</li>
+<li>a remote Dina may be social, institutional, or infrastructural</li>
+</ul>
+<h3 id="135a-persona-and-sensitivity-scope">13.5A Persona and Sensitivity Scope</h3>
+<p>The interaction protocol SHOULD treat persona scope as part of routing, not merely storage.</p>
+<p>At minimum, a conforming implementation SHOULD evaluate:</p>
+<ul>
+<li>target persona or personas</li>
+<li>persona tier</li>
+<li>interaction sensitivity</li>
+<li>whether the request crosses persona boundaries</li>
+<li>whether approval, grant, or explicit unlock is required</li>
+</ul>
+<p>This is necessary for interoperable governance because:</p>
+<ul>
+<li>remembering into health is not governed like remembering into general</li>
+<li>a finance request is not governed like a restaurant booking</li>
+<li>a plan spanning multiple personas may require explicit cross-persona consent</li>
+</ul>
+<h3 id="136-context-resolution">13.6 Context Resolution</h3>
+<p>Before fulfillment, a Dina-compatible implementation SHOULD resolve:</p>
+<ul>
+<li>subject context</li>
+<li>spatial context</li>
+<li>temporal context</li>
+<li>conversation context</li>
+<li>relationship context</li>
+<li>policy context</li>
+<li>confidence</li>
+</ul>
+<p>This is what allows phrases like:</p>
+<ul>
+<li>"this bus"</li>
+<li>"here"</li>
+<li>"them"</li>
+<li>"my usual route"</li>
+</ul>
+<p>to become structured interoperable requests.</p>
+<h3 id="136a-delivery-and-notification-contract">13.6A Delivery and Notification Contract</h3>
+<p>The interaction protocol SHOULD also standardize how work completion and failure are surfaced back to the human.</p>
+<p>At minimum, implementations should distinguish:</p>
+<ul>
+<li>inline response</li>
+<li>queued completion notice</li>
+<li>proactive failure notice</li>
+<li>briefing inclusion</li>
+<li>escalation due to harm if ignored</li>
+</ul>
+<p>This is the outbound half of Silence First.</p>
+<h3 id="137-response-contract">13.7 Response Contract</h3>
+<p>The response layer SHOULD support a portable envelope with a small, typed set of response kinds:</p>
+<ul>
+<li><code>summary</code></li>
+<li><code>list</code></li>
+<li><code>table</code></li>
+<li><code>comparison</code></li>
+<li><code>status</code></li>
+<li><code>error</code></li>
+<li><code>raw</code></li>
+</ul>
+<p>This is not just UI polish. It is part of protocol interoperability because agents, Dinas, bridges, and clients need a stable result contract.</p>
+<p>At minimum, the response envelope SHOULD freeze these core fields:</p>
+<ul>
+<li><code>schema_version</code></li>
+<li><code>type</code></li>
+<li><code>title</code></li>
+<li><code>text</code></li>
+<li><code>data</code></li>
+<li><code>meta</code></li>
+</ul>
+<p>The response layer SHOULD also remain explicitly extensible. A conforming envelope MAY include:</p>
+<ul>
+<li><code>annotations</code></li>
+<li><code>disclosures</code></li>
+<li><code>extensions</code></li>
+</ul>
+<p>This is important because different Dina-compatible ecosystems may allow different downstream behaviors while still remaining interoperable.</p>
+<p>Examples:</p>
+<ul>
+<li>provenance annotations</li>
+<li>trust or confidence annotations</li>
+<li>sponsorship or commercial disclosures</li>
+<li>implementation-specific rendering hints</li>
+</ul>
+<p>The protocol should require that such additions be explicit and machine-readable rather than hidden inside arbitrary text.</p>
+<p>A draft machine-readable schema for this contract lives in:</p>
+<ul>
+<li><code>schemas/response-envelope.json</code></li>
+</ul>
+<p>Implementations SHOULD advertise supported response kinds, envelope versions, and extension namespaces through the capability discovery layer.</p>
+<h3 id="138-bridges-vs-native-d2d">13.8 Bridges vs Native D2D</h3>
+<p>Email, chat apps, and provider APIs remain important, but they are not the same thing as Dina-to-Dina communication.</p>
+<p>The interaction protocol therefore distinguishes:</p>
+<ul>
+<li>native D2D coordination</li>
+<li>provider / infrastructure requests</li>
+<li>bridge delivery over email or chat</li>
+</ul>
+<p>This preserves the qualitative difference between:</p>
+<ul>
+<li>person-to-person sovereign coordination</li>
+<li>formal correspondence</li>
+<li>service requests</li>
+</ul>
+<p>without requiring every implementation to expose those differences through the same UI.</p>
+<h2 id="14-conformance-profiles">14. Conformance Profiles</h2>
+<p>Not every implementation must implement every layer.</p>
+<p>The protocol SHOULD define conformance profiles.</p>
+<p>Implementations SHOULD advertise their supported profile identifiers through the capability discovery layer.</p>
+<h3 id="141-home-node-profile">14.1 Home Node Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>D2D</li>
+<li>Trust publishing or proxying</li>
+<li>Interaction Contract</li>
+</ul>
+<p>This is the fullest Dina implementation.</p>
+<h3 id="142-device-profile">14.2 Device Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>device identity</li>
+<li>request signing</li>
+<li>pairing</li>
+<li>selected interaction operations</li>
+</ul>
+<p>May delegate storage and D2D authority to a Home Node.</p>
+<h3 id="143-agent-executor-profile">14.3 Agent Executor Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Authentication</li>
+<li>Agent Safety contract</li>
+<li>selected interaction semantics</li>
+</ul>
+<p>May act only through a Home Node and does not own Dina identity or vault authority.</p>
+<h3 id="143a-agent-compliance-model">14.3A Agent Compliance Model</h3>
+<p>The protocol SHOULD be explicit about what it means for an agent to be Dina-protocol-compliant.</p>
+<p>Not every agent that can call a Dina endpoint is Dina-protocol-compliant.</p>
+<p>At minimum, the protocol distinguishes:</p>
+<ol>
+<li>Dina-compatible agent executor</li>
+<li>implements the <code>agent-executor</code> profile</li>
+<li>authenticates using Dina-compatible auth</li>
+<li>declares intent and caller identity</li>
+<li>obeys session, grant, approval, and egress controls</li>
+<li>
+<p>consumes or produces supported interaction semantics through a Home Node</p>
+</li>
+<li>
+<p>Dina-aware agent</p>
+</li>
+<li>can talk to a Dina-compatible Home Node or bridge</li>
+<li>but does not itself implement the required executor profile contract</li>
+<li>
+<p>is integration-capable, not protocol-conformant</p>
+</li>
+<li>
+<p>Sovereign Dina implementation</p>
+</li>
+<li>implements a fuller profile such as <code>home-node</code>, <code>provider-dina</code>, or <code>mobile-home-node</code></li>
+<li>may also host or route work to one or more compliant agent executors</li>
+</ol>
+<p>An agent therefore SHOULD NOT be described simply as \"Dina-compatible\" without a profile qualifier.</p>
+<p>Recommended language is:</p>
+<ul>
+<li>\"Dina-compatible agent executor\"</li>
+<li>\"Dina-aware external agent\"</li>
+<li>\"Dina-compatible Home Node\"</li>
+</ul>
+<p>This avoids conflating:</p>
+<ul>
+<li>an executor that works under a Home Node's authority</li>
+<li>a sovereign Dina implementation</li>
+<li>a third-party tool integration that merely speaks some Dina-adjacent API</li>
+</ul>
+<h3 id="143b-minimum-agent-executor-requirements">14.3B Minimum Agent Executor Requirements</h3>
+<p>To claim the <code>agent-executor</code> profile, an agent implementation SHOULD at minimum:</p>
+<ul>
+<li>advertise the <code>agent-executor</code> profile through capability discovery</li>
+<li>support Dina-compatible authentication</li>
+<li>propagate caller context containing principal, actor, origin, and auth mode</li>
+<li>declare semantic operations it can participate in</li>
+<li>honor session and grant boundaries</li>
+<li>surface approval-required actions instead of bypassing them</li>
+<li>preserve portable response-envelope semantics for the results it returns</li>
+<li>avoid claiming storage, D2D, or trust capabilities it does not implement</li>
+</ul>
+<p>An agent executor MAY be narrow.</p>
+<p>For example, an implementation may legitimately support only:</p>
+<ul>
+<li><code>delegate_task</code></li>
+<li><code>answer_now</code></li>
+<li><code>request_service</code></li>
+<li><code>status</code></li>
+</ul>
+<p>provided it advertises that subset honestly and negotiates against the remote common subset.</p>
+<h3 id="144-d2d-service-provider-profile">14.4 D2D Service / Provider Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>D2D endpoint or request endpoint</li>
+<li>selected interaction semantics</li>
+</ul>
+<p>May satisfy requests through direct lookup, internal tools, or delegated execution.</p>
+<h3 id="145-trust-appview-profile">14.5 Trust AppView Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Trust indexing</li>
+<li>trust query endpoints</li>
+</ul>
+<p>Does not need to implement vault storage or agent safety.</p>
+<h3 id="146-bridge-connector-profile">14.6 Bridge Connector Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Authentication to a Home Node</li>
+<li>selected <code>communicate_person</code>, <code>request_service</code>, and <code>watch_condition</code> semantics</li>
+<li>delivery over non-native channels such as email or chat</li>
+</ul>
+<p>This preserves interoperability without making bridges the protocol center.</p>
+<h3 id="147-mobile-home-node-profile">14.7 Mobile Home Node Profile</h3>
+<p>Implements:</p>
+<ul>
+<li>Identity</li>
+<li>Authentication</li>
+<li>Encrypted Storage</li>
+<li>Agent Safety</li>
+<li>D2D (via mailbox relay)</li>
+<li>Trust querying (via hosted AppView)</li>
+<li>Interaction Contract</li>
+</ul>
+<p>Delegates to hosted infrastructure:</p>
+<ul>
+<li>mailbox relay for offline D2D delivery</li>
+<li>AppView for Trust Network queries</li>
+<li>PDS for trust record publishing</li>
+</ul>
+<p>This profile enables zero-cost sovereign operation<br />
+on a mobile device with no user-managed server.</p>
+<h2 id="15-scenario-coverage">15. Scenario Coverage</h2>
+<p>The protocol should be judged against scenario families, not only transport primitives.</p>
+<h3 id="151-personal-memory">15.1 Personal Memory</h3>
+<p>Pattern:</p>
+<ul>
+<li>remember_context</li>
+<li>encrypted storage</li>
+<li>optional approvals</li>
+<li>later <code>answer_now</code> or <code>propose_plan</code></li>
+</ul>
+<h3 id="152-live-world-state-query">15.2 Live World-State Query</h3>
+<p>Pattern:</p>
+<ul>
+<li>answer_now</li>
+<li>context resolution</li>
+<li>provider or infrastructure request</li>
+<li>possible D2D or remote execution</li>
+<li>typed status response</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"What time will the bus reach here?"</li>
+</ul>
+<h3 id="153-social-coordination">15.3 Social Coordination</h3>
+<p>Pattern:</p>
+<ul>
+<li>communicate_person</li>
+<li>D2D preferred</li>
+<li>sharing policy</li>
+<li>approval if needed</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Tell Sancho I'll be 20 minutes late."</li>
+</ul>
+<h3 id="154-provider-request">15.4 Provider Request</h3>
+<p>Pattern:</p>
+<ul>
+<li>request_service</li>
+<li>provider Dina or API</li>
+<li>possible remote task or federated execution</li>
+<li>status or final result</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Ask the clinic whether the doctor is running late."</li>
+</ul>
+<h3 id="155-durable-delegated-work">15.5 Durable Delegated Work</h3>
+<p>Pattern:</p>
+<ul>
+<li>delegate_task</li>
+<li>executor routing</li>
+<li>async lifecycle</li>
+<li>callback or polling</li>
+<li>final structured result</li>
+</ul>
+<h3 id="156-monitoring">15.6 Monitoring</h3>
+<p>Pattern:</p>
+<ul>
+<li>watch_condition</li>
+<li>subscription or polling</li>
+<li>later notification</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Watch this bus and tell me when it is 5 minutes away."</li>
+</ul>
+<h3 id="156a-briefing-and-proactive-delivery">15.6A Briefing and Proactive Delivery</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>deliver_briefing</code></li>
+<li><code>deliver_alert</code></li>
+<li><code>deliver_completion</code></li>
+<li><code>deliver_failure</code></li>
+<li>priority-ranked outbound delivery</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>morning briefing</li>
+<li>failed task that should not stay silent</li>
+<li>urgent reminder that became fiduciary</li>
+</ul>
+<h3 id="157-trust-query">15.7 Trust Query</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>answer_now</code> or <code>propose_plan</code></li>
+<li>trust lookup via AppView</li>
+<li>evidence-aware result</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li>"Show me only items with verified provenance."</li>
+</ul>
+<h3 id="158-trust-publication">15.8 Trust Publication</h3>
+<p>Pattern:</p>
+<ul>
+<li><code>publish_review</code>, <code>publish_vouch</code>, or <code>publish_flag</code></li>
+<li>signed public record</li>
+<li>AppView indexing</li>
+<li>retractable lifecycle</li>
+</ul>
+<h2 id="16-security-properties">16. Security Properties</h2>
+<p>At protocol level, Dina aims to guarantee:</p>
+<ul>
+<li>sovereign identity under user-controlled root material</li>
+<li>request authenticity via Ed25519</li>
+<li>replay protection</li>
+<li>encryption at rest per persona</li>
+<li>explicit safety mediation for risky agent access</li>
+<li>strong D2D confidentiality and authenticity</li>
+<li>attributable public trust publication</li>
+<li>portable interaction semantics above transport</li>
+</ul>
+<h2 id="17-open-standardization-questions">17. Open Standardization Questions</h2>
+<h3 id="171-core-freeze-points">17.1 Core Freeze Points</h3>
+<p>These should be resolved before calling the core protocol frozen:</p>
+<ol>
+<li>Root key material profile</li>
+<li>raw mnemonic entropy vs PBKDF2-expanded BIP-39 seed</li>
+<li>
+<p>recommended 1.0 choice: 24-word BIP-39 mnemonic as recovery secret,<br />
+     PBKDF2-expanded BIP-39 seed as canonical root key material,<br />
+     with SLIP-0010 downstream derivation from that seed</p>
+</li>
+<li>
+<p>D2D generic request-state plane</p>
+</li>
+<li>freeze request modes, lifecycle states, and required fields for federated execution</li>
+<li>
+<p>recommended 1.0 choice: request modes <code>inline_preferred</code>, <code>async</code>, <code>subscription</code>;<br />
+     lifecycle states <code>accepted</code>, <code>waiting_approval</code>, <code>waiting_input</code>, <code>running</code>,<br />
+<code>partial</code>, <code>completed</code>, <code>failed</code>, <code>cancelled</code>, <code>expired</code>;<br />
+     required fields <code>request_id</code>, <code>correlation_id</code>, <code>requested_capability</code>,<br />
+<code>response_mode</code>, <code>status</code>, <code>created_at</code>, <code>updated_at</code></p>
+</li>
+<li>
+<p>Trust core collection subset</p>
+</li>
+<li>define the 1.0 mandatory namespace subset</li>
+<li>
+<p>recommended 1.0 choice: <code>com.dina.trust.attestation</code>,<br />
+<code>com.dina.trust.vouch</code>, <code>com.dina.trust.flag</code>,<br />
+<code>com.dina.trust.revocation</code>, <code>com.dina.trust.verification</code></p>
+</li>
+<li>
+<p>Capability discovery and negotiation</p>
+</li>
+<li>freeze the capability advertisement contract, profile identifiers,<br />
+     extension namespace rules, and live negotiation semantics</li>
+<li>
+<p>recommended 1.0 choice: static capability advertisement plus live negotiation,<br />
+     with profile identifiers at least for <code>home-node</code>, <code>device</code>, <code>agent-executor</code>,<br />
+<code>provider-dina</code>, <code>trust-appview</code>, <code>bridge</code>, and <code>mobile-home-node</code></p>
+</li>
+<li>
+<p>Interaction operation registry</p>
+</li>
+<li>freeze the required core semantic operation set and extension rules</li>
+<li>
+<p>recommended 1.0 choice: freeze semantic names and contracts for<br />
+<code>remember_context</code>, <code>answer_now</code>, <code>propose_plan</code>, <code>communicate_person</code>,<br />
+<code>request_service</code>, <code>delegate_task</code>, <code>watch_condition</code>, <code>approve_operation</code>,<br />
+<code>inspect_status</code>, <code>modify_existing</code>, <code>cancel_operation</code>, <code>recover_operation</code>,<br />
+<code>deliver_briefing</code>, <code>deliver_alert</code>, <code>deliver_update</code>, <code>deliver_completion</code>,<br />
+<code>deliver_failure</code>, <code>request_clarification</code>, <code>escalate_attention</code></p>
+</li>
+<li>
+<p>Response envelope schema</p>
+</li>
+<li>freeze the portable typed response envelope and its extensibility model</li>
+<li>recommended 1.0 choice: response kinds <code>summary</code>, <code>list</code>, <code>table</code>,<br />
+<code>comparison</code>, <code>status</code>, <code>error</code>, <code>raw</code>; required envelope fields<br />
+<code>schema_version</code>, <code>type</code>, <code>text</code>, <code>data</code>; optional standardized fields<br />
+<code>title</code>, <code>meta</code>, <code>annotations</code>, <code>disclosures</code>, <code>extensions</code></li>
+</ol>
+<h3 id="172-profile-and-portability-questions">17.2 Profile and Portability Questions</h3>
+<p>These affect optional profiles, not base protocol interoperability:</p>
+<ol>
+<li>Encrypted vault portability profile</li>
+<li>decide whether Protocol 1.0 will standardize canonical DEK derivation<br />
+     for encrypted vault interchange and seed-based encrypted recovery</li>
+<li>
+<p>otherwise keep logical export/import as the required storage portability contract</p>
+</li>
+<li>
+<p>Mobile storage profile</p>
+</li>
+<li>define minimum SQLCipher-equivalent encryption<br />
+     for iOS Keychain / Android Keystore integration</li>
+<li>define background/foreground lifecycle rules<br />
+     for DEK management on mobile</li>
+</ol>
+<h2 id="18-what-dina-as-protocol-means">18. What "Dina as Protocol" Means</h2>
+<p>When this protocol is implemented correctly:</p>
+<ul>
+<li>a Rust Home Node can interoperate with a Go Home Node</li>
+<li>a Swift device can sign requests against any Dina-compatible node</li>
+<li>a browser bridge can participate in interaction semantics without owning vault authority</li>
+<li>one implementation can discover another implementation's supported profiles and extensions before attempting optional interop</li>
+<li>one Dina can ask another Dina for an outcome, and the remote Dina can satisfy it through its own tools or executors</li>
+<li>any AppView that indexes <code>com.dina.trust.*</code> can serve trust for any Dina-compatible identity</li>
+<li>vaults, trust records, D2D messages, and interaction semantics stop being implementation-private details</li>
+</ul>
+<p>That is the transition from product to infrastructure.</p>
+<h2 id="19-reference-implementation-status">19. Reference Implementation Status</h2>
+<p>The current Dina codebase already provides substantial pieces of this protocol:</p>
+<ul>
+<li>SLIP-0010 <code>m/9999'</code> identity derivation</li>
+<li><code>did:plc</code> and <code>did:key</code> usage</li>
+<li>Ed25519 request signing</li>
+<li>pairing and device registration</li>
+<li>per-persona encrypted storage</li>
+<li>HNSW hydration on unlock and destruction on lock</li>
+<li>session-scoped grants and approvals</li>
+<li>PII scrubbing</li>
+<li>D2D signatures, encryption, outbox, and policy gates</li>
+<li>AT Protocol trust publishing and AppView query integration</li>
+<li>a much more precise interaction architecture than a simple "assistant command" model</li>
+</ul>
+<p>The protocol document is therefore not speculative. It is extracted from a real system, while also identifying the exact points where the system still needs one canonical choice before the protocol can be declared stable.</p>
+</body>
+</html>
