@@ -1,0 +1,49 @@
+{
+  "schema_version": "1",
+  "negotiation_id": "neg-01HZX9Y7Y1M2N3B4V5C6X7Z8A9",
+  "requester_did": "did:plc:rajexamplehome",
+  "responder_did": "did:plc:transitoperatorhome",
+  "status": "accepted",
+  "requested": {
+    "protocol_version": "1.0-draft",
+    "profiles": ["home-node", "provider-dina"],
+    "auth_method": "ed25519-http-v1",
+    "message_family": "coordination.request",
+    "request_mode": "inline_preferred",
+    "response_envelope_version": "1",
+    "required_operations": ["request_service", "deliver_failure"],
+    "required_extensions": ["dina.provenance"],
+    "optional_extensions": ["dina.trust"]
+  },
+  "selected": {
+    "protocol_version": "1.0-draft",
+    "profiles": ["provider-dina"],
+    "auth_method": "ed25519-http-v1",
+    "message_family": "coordination.request",
+    "request_mode": "inline_preferred",
+    "response_envelope_version": "1",
+    "required_operations": ["request_service"],
+    "required_extensions": ["dina.provenance"],
+    "optional_extensions": ["dina.trust"]
+  },
+  "common_subset": {
+    "protocol_version": "1.0-draft",
+    "profiles": ["provider-dina"],
+    "auth_method": "ed25519-http-v1",
+    "message_family": "coordination.request",
+    "request_mode": "inline_preferred",
+    "response_envelope_version": "1",
+    "required_operations": ["request_service"],
+    "required_extensions": ["dina.provenance"]
+  },
+  "fallback": {
+    "use_common_subset": true,
+    "reason": "Responder does not support the optional dina.trust extension in this route."
+  },
+  "expires_at": "2026-04-05T09:30:00Z",
+  "extensions": {
+    "dina.example.session": {
+      "correlation_hint": "bus-eta-42"
+    }
+  }
+}

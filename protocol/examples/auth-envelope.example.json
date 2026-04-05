@@ -1,0 +1,23 @@
+{
+  "schema_version": "1",
+  "auth_scheme": "ed25519-http-v1",
+  "did": "did:key:z6Mkexampledevice1",
+  "timestamp": "2026-04-05T09:00:00Z",
+  "nonce": "4e5f0f6d9e0a4c83b1f2d6a7c8e9f001",
+  "method": "POST",
+  "path": "/v1/agent/tasks",
+  "query": "mode=async",
+  "body_sha256_hex": "44136fa355b3678a1146ad16f7e8649e94fb4fc21f6d6d8b8a5f4f6fbf8f8b19",
+  "signature": "2f0b9198d0b5bd5d2b5d12fbb63f4f382da4c32dcf4ea1b8668841d95c7e85db4ce8af79d4de7d012823cb489f8f7e73c4d7940dfcf0e0a2db8f8e01db9f4705",
+  "caller": {
+    "principal": "did:plc:rajexamplehome",
+    "actor": "did:key:z6Mkexampledevice1",
+    "origin": "cli",
+    "auth_mode": "device_signature"
+  },
+  "extensions": {
+    "dina.example.trace": {
+      "trace_id": "trace-01HZXA5ME9QB8M6Y5D4C3B2A1Z"
+    }
+  }
+}

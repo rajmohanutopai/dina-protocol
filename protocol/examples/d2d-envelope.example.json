@@ -1,0 +1,39 @@
+{
+  "schema_version": "1",
+  "message_id": "msg-01HZXAB2D12F3G4H5J6K7L8M9N",
+  "family": "coordination.request",
+  "from": "did:plc:rajexamplehome",
+  "to": ["did:plc:transitoperatorhome"],
+  "created_at": "2026-04-05T09:05:00Z",
+  "correlation_id": "req-eta-bus-42-central-stop",
+  "response_mode": "inline_preferred",
+  "status": "accepted",
+  "body": {
+    "operation": "request_service",
+    "requested_capability": "transit.eta_lookup",
+    "subject": {
+      "kind": "transit_vehicle",
+      "route_id": "42",
+      "direction": "downtown"
+    },
+    "location": {
+      "kind": "stop",
+      "stop_id": "central-stop-b",
+      "label": "Central Station Stop B"
+    },
+    "request": {
+      "question": "What time will bus 42 reach Central Station Stop B?"
+    }
+  },
+  "attachments": [],
+  "transport": {
+    "mode": "sealed-box",
+    "ciphertext": "BASE64_CIPHERTEXT_PLACEHOLDER",
+    "signature": "HEX_SIGNATURE_PLACEHOLDER"
+  },
+  "extensions": {
+    "dina.provenance": {
+      "request_origin": "user-query"
+    }
+  }
+}

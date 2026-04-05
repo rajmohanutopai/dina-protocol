@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/capability-advertisement.json",
+  "title": "Dina Capability Advertisement",
+  "description": "Static advertisement of protocol versions, profiles, capabilities, and limits supported by a Dina-compatible implementation.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "advertisement_id",
+    "protocol_versions",
+    "profiles",
+    "capabilities"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "advertisement_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "did": {
+      "$ref": "#/$defs/did"
+    },
+    "implementation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "home_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": true
+    },
+    "protocol_versions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["auth", "d2d", "interaction", "trust"],
+      "properties": {
+        "auth": {
+          "type": "object",
+          "properties": {
+            "methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "pairing_methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": ["methods"],
+          "additionalProperties": true
+        },
+        "d2d": {
+          "type": "object",
+          "properties": {
+            "message_families": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "request_modes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "lifecycle_states": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "supports_mailbox_relay": {
+              "type": "boolean"
+            },
+            "supports_federated_execution": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": true
+        },
+        "interaction": {
+          "type": "object",
+          "properties": {
+            "operations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "response_envelope_versions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "response_kinds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "response_extensions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "supports_proactive_delivery": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": true
+        },
+        "trust": {
+          "type": "object",
+          "properties": {
+            "collections": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "supports_publish": {
+              "type": "boolean"
+            },
+            "supports_query": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": true
+        },
+        "storage": {
+          "type": "object",
+          "properties": {
+            "supports_logical_export_import": {
+              "type": "boolean"
+            },
+            "encrypted_vault_profiles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "delivery": {
+          "type": "object",
+          "properties": {
+            "modes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "max_payload_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_attachment_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_timeout_seconds": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:.+$"
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

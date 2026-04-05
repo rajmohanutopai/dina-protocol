@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/agent-intent.json",
+  "title": "Dina Agent Intent",
+  "description": "Portable executor intent declaration evaluated by a Dina-compatible Home Node before sensitive access or external action.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "intent_id",
+    "agent_did",
+    "action",
+    "target",
+    "persona_scope",
+    "constraints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "intent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_did": {
+      "$ref": "#/$defs/did"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": ["string", "object"],
+      "minLength": 1,
+      "additionalProperties": true
+    },
+    "persona_scope": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
+    },
+    "trust_level": {
+      "type": "string"
+    },
+    "sensitivity": {
+      "type": "string"
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "egress": {
+          "type": "string"
+        },
+        "allow_network": {
+          "type": "boolean"
+        },
+        "max_duration_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_cost_hint": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requires_approval": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "requested_operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:.+$"
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

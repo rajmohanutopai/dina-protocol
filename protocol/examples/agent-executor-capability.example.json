@@ -1,0 +1,51 @@
+{
+  "schema_version": "1",
+  "advertisement_id": "cap-adv-agent-01HZXB9N8M7L6K5J4H3G2F1E0D",
+  "did": "did:key:z6Mkagentexecutor123",
+  "implementation": {
+    "name": "Transit ETA Agent",
+    "version": "0.1.0-draft"
+  },
+  "protocol_versions": ["1.0-draft"],
+  "profiles": ["agent-executor"],
+  "capabilities": {
+    "auth": {
+      "methods": ["ed25519-http-v1"]
+    },
+    "d2d": {
+      "message_families": [],
+      "request_modes": ["inline_preferred", "async"],
+      "lifecycle_states": ["accepted", "running", "completed", "failed"],
+      "supports_mailbox_relay": false,
+      "supports_federated_execution": false
+    },
+    "interaction": {
+      "operations": ["answer_now", "request_service", "delegate_task", "inspect_status"],
+      "response_envelope_versions": ["1"],
+      "response_kinds": ["status", "summary", "error"],
+      "response_extensions": ["dina.provenance"],
+      "supports_proactive_delivery": false
+    },
+    "trust": {
+      "collections": [],
+      "supports_publish": false,
+      "supports_query": false
+    },
+    "storage": {
+      "supports_logical_export_import": false,
+      "encrypted_vault_profiles": []
+    },
+    "delivery": {
+      "modes": []
+    }
+  },
+  "limits": {
+    "max_payload_bytes": 65536,
+    "max_timeout_seconds": 15
+  },
+  "extensions": {
+    "dina.example.executor": {
+      "requires_home_node_authority": true
+    }
+  }
+}

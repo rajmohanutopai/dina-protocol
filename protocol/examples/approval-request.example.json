@@ -1,0 +1,43 @@
+{
+  "schema_version": "1",
+  "approval_id": "apr-01HZXAFQWERTY1234567890ABC",
+  "session_id": "sess-01HZXAFE1234567890ABCDEFG",
+  "operation": "request_service",
+  "summary": "Share your allergy summary with the clinic and ask whether the doctor is running late.",
+  "reason": "The request crosses into the health persona and discloses sensitive medical data to an external provider.",
+  "status": "pending",
+  "intent_classification": "review",
+  "sensitivity": "sensitive",
+  "requested_scopes": ["health.read.summary", "provider.request.clinic"],
+  "counterparties": ["did:plc:clinicexamplehome"],
+  "requested_by": {
+    "principal": "did:plc:rajexamplehome",
+    "actor": "did:key:z6Mkexampledevice1",
+    "origin": "telegram",
+    "auth_mode": "device_signature"
+  },
+  "proposed_action": {
+    "persona_id": "health",
+    "share_mode": "summary_only",
+    "request": "Is Dr. Mehra running late for the 4:00 PM appointment?"
+  },
+  "created_at": "2026-04-05T09:10:00Z",
+  "expires_at": "2026-04-05T09:20:00Z",
+  "annotations": [
+    {
+      "name": "risk_level",
+      "value": "high"
+    }
+  ],
+  "disclosures": [
+    {
+      "name": "data_shared",
+      "value": ["allergy_summary"]
+    }
+  ],
+  "extensions": {
+    "dina.example.preview": {
+      "message_preview": "Share allergy summary and ask about appointment delay."
+    }
+  }
+}

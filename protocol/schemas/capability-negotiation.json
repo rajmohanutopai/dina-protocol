@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/capability-negotiation.json",
+  "title": "Dina Capability Negotiation",
+  "description": "Live negotiation for selecting a common protocol subset between two Dina-compatible implementations.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "negotiation_id",
+    "status",
+    "requested"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "negotiation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requester_did": {
+      "$ref": "#/$defs/did"
+    },
+    "responder_did": {
+      "$ref": "#/$defs/did"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "accepted", "rejected", "partial"]
+    },
+    "requested": {
+      "$ref": "#/$defs/selection"
+    },
+    "selected": {
+      "$ref": "#/$defs/selection"
+    },
+    "common_subset": {
+      "$ref": "#/$defs/selection"
+    },
+    "fallback": {
+      "type": "object",
+      "properties": {
+        "use_common_subset": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "reason": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:.+$"
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "protocol_version": {
+          "type": "string"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "auth_method": {
+          "type": "string"
+        },
+        "message_family": {
+          "type": "string"
+        },
+        "request_mode": {
+          "type": "string"
+        },
+        "response_envelope_version": {
+          "type": "string"
+        },
+        "required_operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "required_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "optional_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

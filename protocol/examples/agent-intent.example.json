@@ -1,0 +1,29 @@
+{
+  "schema_version": "1",
+  "intent_id": "intent-01HZXC5P4N3M2L1K0J9H8G7F6E",
+  "agent_did": "did:key:z6Mkagentexecutor123",
+  "session_id": "sess-01HZXAFE1234567890ABCDEFG",
+  "action": "request_service",
+  "target": {
+    "service": "transit.eta_lookup",
+    "route_id": "42",
+    "stop_id": "central-stop-b"
+  },
+  "persona_scope": "travel",
+  "trust_level": "standard",
+  "sensitivity": "normal",
+  "constraints": {
+    "egress": "provider_only",
+    "allow_network": true,
+    "max_duration_seconds": 15,
+    "max_cost_hint": 0,
+    "requires_approval": false
+  },
+  "requested_operations": ["answer_now", "request_service"],
+  "created_at": "2026-04-05T09:16:00Z",
+  "extensions": {
+    "dina.example.routing": {
+      "preferred_provider": "did:plc:transitoperatorhome"
+    }
+  }
+}

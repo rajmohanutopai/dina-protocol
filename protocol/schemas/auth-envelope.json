@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/auth-envelope.json",
+  "title": "Dina Auth Envelope",
+  "description": "Normalized signed-request envelope for Dina-compatible HTTP authentication.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "auth_scheme",
+    "did",
+    "timestamp",
+    "nonce",
+    "method",
+    "path",
+    "body_sha256_hex",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "auth_scheme": {
+      "type": "string",
+      "const": "ed25519-http-v1"
+    },
+    "did": {
+      "$ref": "#/$defs/did"
+    },
+    "timestamp": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method": {
+      "type": "string",
+      "pattern": "^[A-Z]+$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^/.*$"
+    },
+    "query": {
+      "type": "string"
+    },
+    "body_sha256_hex": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 1
+    },
+    "caller": {
+      "type": "object",
+      "properties": {
+        "principal": {
+          "$ref": "#/$defs/did"
+        },
+        "actor": {
+          "$ref": "#/$defs/did"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "auth_mode": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:.+$"
+    },
+    "timestamp": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
+      ]
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

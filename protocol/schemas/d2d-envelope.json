@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/d2d-envelope.json",
+  "title": "Dina D2D Envelope",
+  "description": "Logical Dina-to-Dina message envelope with optional transport metadata.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "message_id",
+    "family",
+    "from",
+    "to",
+    "created_at",
+    "body"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "message_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "from": {
+      "$ref": "#/$defs/did"
+    },
+    "to": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/did"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "created_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "correlation_id": {
+      "type": "string"
+    },
+    "response_mode": {
+      "type": "string",
+      "enum": ["inline_preferred", "async", "subscription"]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "waiting_approval",
+        "waiting_input",
+        "running",
+        "partial",
+        "completed",
+        "failed",
+        "cancelled",
+        "expired"
+      ]
+    },
+    "body": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "media_type": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": true
+      }
+    },
+    "transport": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "ciphertext": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:.+$"
+    },
+    "timestamp": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        }
+      ]
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

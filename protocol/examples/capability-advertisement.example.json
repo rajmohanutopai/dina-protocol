@@ -1,0 +1,98 @@
+{
+  "schema_version": "1",
+  "advertisement_id": "cap-adv-01HZX9K0N3Q2T7M6R5S4P3A2B1",
+  "did": "did:plc:rajexamplehome",
+  "implementation": {
+    "name": "Dina Reference Home Node",
+    "version": "0.1.0-draft",
+    "home_url": "https://home.example.dina"
+  },
+  "protocol_versions": ["1.0-draft"],
+  "profiles": ["home-node", "mobile-home-node"],
+  "capabilities": {
+    "auth": {
+      "methods": ["ed25519-http-v1", "paired_token"],
+      "pairing_methods": ["pairing-code-v1"]
+    },
+    "d2d": {
+      "message_families": [
+        "presence.signal",
+        "coordination.request",
+        "coordination.response",
+        "social.update",
+        "safety.alert",
+        "trust.vouch.request",
+        "trust.vouch.response"
+      ],
+      "request_modes": ["inline_preferred", "async", "subscription"],
+      "lifecycle_states": [
+        "accepted",
+        "waiting_approval",
+        "waiting_input",
+        "running",
+        "partial",
+        "completed",
+        "failed",
+        "cancelled",
+        "expired"
+      ],
+      "supports_mailbox_relay": true,
+      "supports_federated_execution": true
+    },
+    "interaction": {
+      "operations": [
+        "remember_context",
+        "answer_now",
+        "propose_plan",
+        "communicate_person",
+        "request_service",
+        "delegate_task",
+        "watch_condition",
+        "approve_operation",
+        "inspect_status",
+        "modify_existing",
+        "cancel_operation",
+        "recover_operation",
+        "deliver_briefing",
+        "deliver_alert",
+        "deliver_update",
+        "deliver_completion",
+        "deliver_failure",
+        "request_clarification",
+        "escalate_attention"
+      ],
+      "response_envelope_versions": ["1"],
+      "response_kinds": ["summary", "list", "table", "comparison", "status", "error", "raw"],
+      "response_extensions": ["dina.provenance", "dina.trust", "dina.disclosure"],
+      "supports_proactive_delivery": true
+    },
+    "trust": {
+      "collections": [
+        "com.dina.trust.attestation",
+        "com.dina.trust.vouch",
+        "com.dina.trust.flag",
+        "com.dina.trust.revocation",
+        "com.dina.trust.verification"
+      ],
+      "supports_publish": true,
+      "supports_query": true
+    },
+    "storage": {
+      "supports_logical_export_import": true,
+      "encrypted_vault_profiles": ["dina.encrypted-vault.v1"]
+    },
+    "delivery": {
+      "modes": ["inbox", "push", "briefing"]
+    }
+  },
+  "limits": {
+    "max_payload_bytes": 262144,
+    "max_attachment_bytes": 5242880,
+    "max_timeout_seconds": 30
+  },
+  "extensions": {
+    "dina.example.transport": {
+      "supports_http3": false
+    }
+  }
+}

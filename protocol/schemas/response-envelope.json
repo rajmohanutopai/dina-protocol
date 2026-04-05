@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dina.ai/protocol/schemas/response-envelope.json",
+  "title": "Dina Response Envelope",
+  "description": "Portable typed response contract used across Dinas, agents, bridges, and clients.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "type",
+    "text",
+    "data"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["summary", "list", "table", "comparison", "status", "error", "raw"]
+    },
+    "title": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "annotations": {
+      "$ref": "#/$defs/named_items"
+    },
+    "disclosures": {
+      "$ref": "#/$defs/named_items"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "named_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": ["string", "number", "integer", "boolean", "object", "array", "null"]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9._:-]+$"
+      },
+      "additionalProperties": true
+    }
+  }
+}

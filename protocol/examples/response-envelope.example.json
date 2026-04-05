@@ -1,0 +1,34 @@
+{
+  "schema_version": "1",
+  "type": "status",
+  "title": "Bus 42 ETA",
+  "text": "Bus 42 is expected at Central Station Stop B in 12 minutes.",
+  "data": {
+    "stage": "transit",
+    "scheduled_at": "2026-04-05T09:18:00Z",
+    "predicted_at": "2026-04-05T09:25:00Z",
+    "delay_minutes": 7,
+    "source": "transitoperatorhome"
+  },
+  "meta": {
+    "task_id": "req-eta-bus-42-central-stop",
+    "generated_at": "2026-04-05T09:13:00Z"
+  },
+  "annotations": [
+    {
+      "name": "provenance",
+      "value": "traffic+operator-db"
+    }
+  ],
+  "disclosures": [
+    {
+      "name": "commercial_content",
+      "value": false
+    }
+  ],
+  "extensions": {
+    "dina.trust": {
+      "confidence": 0.91
+    }
+  }
+}
